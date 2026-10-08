@@ -64,12 +64,6 @@
   },
   "recorder": {
     "title": "Grabadora",
-    "mode": "Qué grabar",
-    "modes": {
-      "mic": "Micrófono",
-      "meeting": "Reunión online"
-    },
-    "meetingUnsupported": "Tu navegador o dispositivo no permite capturar el audio de una pestaña o del sistema.",
     "language": "Idioma del audio",
     "start": "Grabar",
     "recordingLabel": "Grabación en curso",
@@ -81,7 +75,6 @@
     "discard": "Descartar",
     "discardConfirm": "¿Descartar?",
     "hintMic": "Pulsa Grabar para empezar. Si cierras la pestaña sin querer, la grabación se recupera al volver.",
-    "hintMeeting": "Te pediremos el micrófono y que elijas la pestaña o pantalla de la reunión. Marca «Compartir audio» para que se grabe también la voz de los demás.",
     "defaultName": "Reunión",
     "recoveredName": "Recuperada ·",
     "recovered": "Se ha recuperado una grabación que quedó interrumpida. La tienes en la biblioteca.",
@@ -90,7 +83,6 @@
       "denied": "No hay permiso para usar el micrófono. Actívalo en el candado de la barra de direcciones y vuelve a intentarlo.",
       "noDevice": "No se encuentra ningún micrófono. Conecta uno y vuelve a intentarlo.",
       "busy": "El micrófono está siendo usado por otra aplicación.",
-      "noSystemAudio": "No se compartió audio. Vuelve a elegir la pestaña y marca «Compartir audio» (en Chrome, con una pestaña o con «Toda la pantalla»).",
       "failed": "No se pudo grabar. Inténtalo de nuevo."
     }
   },

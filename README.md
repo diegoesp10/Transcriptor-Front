@@ -6,7 +6,7 @@ Murmur es solo la interfaz. La transcripción la hace el backend **MeetingTransc
 
 ## Qué hace
 
-- **Grabar** desde el micrófono, o una **reunión online** (micrófono más el audio de una pestaña o de la pantalla, para Meet, Teams o Zoom en el navegador). Permite elegir y probar el micrófono antes de empezar y pausar, y recupera la grabación si se cierra la pestaña.
+- **Grabar** con un micrófono, que se puede elegir y probar antes de empezar. Permite pausar, y recupera la grabación si se cierra la pestaña.
 - **Seguir la transcripción en directo**: fase actual con su porcentaje, audio procesado, tiempo que lleva y voces detectadas, con el [canal de progreso](docs/PROGRESO-EN-TIEMPO-REAL.md) del backend (o consultando el estado cada pocos segundos si no lo tiene).
 - **Nombres de las voces**: si alguien se presenta («me llamo Marta»), el servidor lo detecta y la transcripción lo muestra; se pueden cambiar a mano.
 - **Subir** audio y vídeo (`mp3`, `wav`, `m4a`, `flac`, `ogg`, `aac`, `mp4`, `mov`, `mkv`, `webm`; hasta 2 GB) con progreso y cancelación.
@@ -146,7 +146,6 @@ Las grabaciones y las transcripciones son datos personales. Murmur guarda una co
 | La pastilla dice «En espera» | El backend ha pedido bajar el ritmo de peticiones. Se reanuda sola. |
 | `Port 5180 is already in use` | Hay otra instancia en ese puerto. Usa `pnpm dev --port 5181`. |
 | No aparece «Seleccionar carpeta» | El navegador no lo permite (Firefox, Safari) o la página no está en HTTPS. Se ofrecen descargas en su lugar. |
-| En «Reunión online» no se oye a los demás | Al compartir la pestaña o la pantalla hay que marcar «Compartir audio». |
 
 ## Estructura
 

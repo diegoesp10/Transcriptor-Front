@@ -181,10 +181,6 @@
     align-items: stretch;
   }
 
-  .recorder-top .segmented {
-    display: grid;
-  }
-
   .recorder-top .select {
     justify-content: flex-start;
   }

@@ -5,19 +5,15 @@ import { newId } from '../utils/format';
 import { computePeaks, pickRecorderMime, toPeaks } from '../utils/media';
 
 /*
- * Grabación dentro de la propia app.
- *  - mic:     micrófono.
- *  - meeting: micrófono + audio de una pestaña o de todo el sistema (getDisplayMedia), mezclados en una sola pista. Sirve
- *             para grabar Teams/Meet/Zoom en el navegador: en el selector hay que marcar «Compartir audio».
- * La señal pasa por un grafo Web Audio (mezcla → analizador → destino) y el MediaRecorder graba el destino. Cada segundo se
+ * Grabación dentro de la propia app, con un micrófono (el elegido en el selector o el predeterminado del sistema).
+ * La señal pasa por un grafo Web Audio (fuente → analizador → destino) y el MediaRecorder graba el destino. Cada segundo se
  * guarda un trozo en IndexedDB: si la pestaña se cierra o el navegador falla, la grabación se recupera al volver.
  */
 
-export type RecorderMode = 'mic' | 'meeting';
 export type RecorderPhase = 'idle' | 'requesting' | 'recording' | 'paused';
 /** Avisos que no impiden grabar: el micrófono elegido ya no estaba y se usó el predeterminado */
 export type RecorderNotice = 'micFallback';
-export type RecorderError = 'unsupported' | 'denied' | 'noDevice' | 'busy' | 'noSystemAudio' | 'failed';
+export type RecorderError = 'unsupported' | 'denied' | 'noDevice' | 'busy' | 'failed';
 
 export interface Recording {
   blob: Blob;
@@ -25,15 +21,12 @@ export interface Recording {
   durationSec: number;
   /** Picos normalizados para dibujar la onda */
   peaks: number[];
-  mode: RecorderMode;
   startedAt: string;
   /** Borra la copia de seguridad por trozos. Llamar solo cuando la grabación ya está guardada en la biblioteca. */
   release: () => Promise<void>;
 }
 
 export const supportsRecording = () => typeof MediaRecorder !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
-/** Capturar el audio de una pestaña o del sistema no existe en móviles ni en Safari */
-export const supportsMeetingCapture = () => !!navigator.mediaDevices?.getDisplayMedia && !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 class RecorderFailure extends Error {
   readonly code: RecorderError;
@@ -55,7 +48,6 @@ interface Live {
   writes: Promise<unknown>;
   seq: number;
   session: RecordingSession;
-  mode: RecorderMode;
   levels: number[];
   startedAt: number;
   pausedAt: number | null;
@@ -107,20 +99,18 @@ export function useRecorder(onFinish: (recording: Recording) => void) {
       mime: current.session.mime,
       durationSec,
       peaks,
-      mode: current.mode,
       startedAt: current.startedIso,
       release,
     });
   }, []);
 
   const start = useCallback(
-    async (mode: RecorderMode, language: string, micId = '') => {
+    async (language: string, micId = '') => {
       if (live.current) return;
       setError(null);
       setNotice(null);
       setPhase('requesting');
       const streams: MediaStream[] = [];
-      let step: 'mic' | 'display' = 'mic';
       try {
         if (!supportsRecording()) throw new RecorderFailure('unsupported');
         const processing = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
@@ -139,24 +129,15 @@ export function useRecorder(onFinish: (recording: Recording) => void) {
           mic = await navigator.mediaDevices.getUserMedia({ audio: processing });
         }
         streams.push(mic);
-        let display: MediaStream | null = null;
-        if (mode === 'meeting') {
-          step = 'display';
-          display = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-          streams.push(display);
-          if (display.getAudioTracks().length === 0) throw new RecorderFailure('noSystemAudio');
-        }
 
         const ctx = new AudioContext();
         await ctx.resume();
-        const mix = ctx.createGain();
-        ctx.createMediaStreamSource(mic).connect(mix);
-        if (display) ctx.createMediaStreamSource(new MediaStream(display.getAudioTracks())).connect(mix);
+        const source = ctx.createMediaStreamSource(mic);
         const destination = ctx.createMediaStreamDestination();
-        mix.connect(destination);
+        source.connect(destination);
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 1024;
-        mix.connect(analyser);
+        source.connect(analyser);
 
         const mime = pickRecorderMime();
         const recorder = new MediaRecorder(destination.stream, { mimeType: mime || undefined, audioBitsPerSecond: 64_000 });
@@ -174,7 +155,6 @@ export function useRecorder(onFinish: (recording: Recording) => void) {
           writes,
           seq: 0,
           session,
-          mode,
           levels: [],
           startedAt: performance.now(),
           pausedAt: null,
@@ -198,7 +178,7 @@ export function useRecorder(onFinish: (recording: Recording) => void) {
         };
         recorder.onstop = () => void finalize(current);
         recorder.onerror = () => setError('failed');
-        // Si se desconecta el micrófono o se deja de compartir la pestaña, se cierra la grabación con lo que haya
+        // Si se desconecta el micrófono, se cierra la grabación con lo que haya
         mic.getAudioTracks()[0]?.addEventListener('ended', () => stop());
         recorder.start(1000);
         setPhase('recording');
@@ -250,8 +230,6 @@ export function useRecorder(onFinish: (recording: Recording) => void) {
         setPhase('idle');
         if (caught instanceof RecorderFailure) return setError(caught.code);
         const name = caught instanceof DOMException ? caught.name : '';
-        // Cancelar el selector de pantalla no es un error
-        if (name === 'NotAllowedError' && step === 'display') return;
         if (name === 'NotAllowedError' || name === 'SecurityError') return setError('denied');
         if (name === 'NotFoundError' || name === 'OverconstrainedError') return setError('noDevice');
         if (name === 'NotReadableError') return setError('busy');

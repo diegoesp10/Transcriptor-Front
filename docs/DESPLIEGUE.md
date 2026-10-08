@@ -151,7 +151,7 @@ Con HTTPS asegurado en todas las rutas, activa `HSTS_MAX_AGE=31536000`.
 
 - Sirve `dist/` desde memoria, ya comprimido (brotli y gzip), con `ETag`. Los archivos de `/assets/` (con hash en el nombre) llevan caché de un año; `index.html` se revalida siempre, así que un despliegue nuevo se ve al recargar.
 - Reenvía `/api/*` y `/health` al backend. Quita la `X-Api-Key`, `Authorization` y `Cookie` que vengan del navegador y pone la suya. Las subidas y las respuestas pasan en streaming, sin cargarse en memoria. El progreso en directo sale sin búfer. Si el navegador cancela, corta también la petición al backend.
-- Añade cabeceras de seguridad: CSP (con el hash del único script en línea), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer` y una `Permissions-Policy` que solo permite micrófono, captura de pantalla y pantalla encendida a la propia web.
+- Añade cabeceras de seguridad: CSP (con el hash del único script en línea), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer` y una `Permissions-Policy` que solo permite el micrófono y mantener la pantalla encendida a la propia web.
 - `/healthz` y `/readyz` no piden autenticación; todo lo demás sí, si está configurada.
 - Al recibir `SIGTERM` deja de aceptar conexiones, cierra los flujos de progreso (el navegador reconecta solo con la nueva instancia) y sale.
 

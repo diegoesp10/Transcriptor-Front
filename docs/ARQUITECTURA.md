@@ -80,7 +80,7 @@ El destino final de cada reunión es una carpeta del equipo del usuario. El serv
 
 ## Grabación y micrófonos
 
-- `useRecorder` graba con `MediaRecorder`. En el modo «Reunión online» mezcla con Web Audio el micrófono y el audio de la pestaña o de la pantalla compartida. Mientras graba mantiene la pantalla encendida (Wake Lock) y deja navegar por la app.
+- `useRecorder` graba un micrófono con `MediaRecorder`, a través de Web Audio para medir el nivel. Mientras graba mantiene la pantalla encendida (Wake Lock) y deja navegar por la app.
 - `useMicrophones` lista las entradas de audio del equipo donde se abre la app y se actualiza al conectar o desconectar dispositivos. El navegador solo da los nombres después de conceder permiso de micrófono una vez; hasta entonces se ofrece «Permitir acceso».
 - El micrófono elegido se recuerda en el navegador. Si ya no existe, se graba con el predeterminado del sistema y se avisa.
 - La onda de la grabación se calcula a partir del archivo grabado, porque las animaciones en directo se detienen cuando la pestaña está en segundo plano.

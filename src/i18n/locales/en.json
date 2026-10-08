@@ -64,12 +64,6 @@
   },
   "recorder": {
     "title": "Recorder",
-    "mode": "What to record",
-    "modes": {
-      "mic": "Microphone",
-      "meeting": "Online meeting"
-    },
-    "meetingUnsupported": "Your browser or device can't capture the audio of a tab or the system.",
     "language": "Audio language",
     "start": "Record",
     "recordingLabel": "Recording in progress",
@@ -81,7 +75,6 @@
     "discard": "Discard",
     "discardConfirm": "Discard?",
     "hintMic": "Press Record to start. If you close the tab by accident, the recording is recovered when you come back.",
-    "hintMeeting": "We'll ask for your microphone and for you to pick the meeting's tab or screen. Tick “Share audio” so everyone else's voice is recorded too.",
     "defaultName": "Meeting",
     "recoveredName": "Recovered ·",
     "recovered": "An interrupted recording was recovered. You'll find it in the library.",
@@ -90,7 +83,6 @@
       "denied": "Microphone permission was denied. Enable it from the padlock in the address bar and try again.",
       "noDevice": "No microphone found. Plug one in and try again.",
       "busy": "The microphone is being used by another application.",
-      "noSystemAudio": "No audio was shared. Pick the tab again and tick “Share audio” (in Chrome, with a tab or “Entire screen”).",
       "failed": "Recording failed. Please try again."
     }
   },

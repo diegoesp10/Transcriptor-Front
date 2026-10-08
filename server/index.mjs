@@ -171,8 +171,8 @@ function securityHeaders() {
     'Referrer-Policy': 'no-referrer',
     'X-Frame-Options': 'DENY',
     'Cross-Origin-Opener-Policy': 'same-origin',
-    // Micrófono, captura de pestaña o pantalla y pantalla encendida: solo esta web. El resto, para nadie.
-    'Permissions-Policy': 'microphone=(self), display-capture=(self), screen-wake-lock=(self), camera=(), geolocation=(), payment=(), usb=()',
+    // Micrófono y pantalla encendida: solo esta web. El resto (también capturar la pantalla), para nadie.
+    'Permissions-Policy': 'microphone=(self), screen-wake-lock=(self), display-capture=(), camera=(), geolocation=(), payment=(), usb=()',
   };
   if (config.hstsSeconds > 0) headers['Strict-Transport-Security'] = `max-age=${config.hstsSeconds}; includeSubDomains`;
   return headers;

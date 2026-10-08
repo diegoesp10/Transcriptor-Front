@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, ArrowRight, Download, Hourglass, Info, Mic, MonitorSpeaker, Pause, Play, Trash2, WifiOff } from 'lucide-react';
+import { AlertCircle, ArrowRight, Download, Hourglass, Info, Pause, Play, Trash2, WifiOff } from 'lucide-react';
 import { ConfirmButton } from '../components/ConfirmButton';
 import { Dropzone } from '../components/Dropzone';
 import { EngineNotice } from '../components/EngineNotice';
@@ -10,12 +10,11 @@ import { Loader } from '../components/Loader';
 import { MediaPlayer } from '../components/MediaPlayer';
 import { MicPicker } from '../components/MicPicker';
 import { Panel } from '../components/Panel';
-import { Segmented } from '../components/Segmented';
 import { StatusBadge } from '../components/StatusBadge';
 import { useIngest } from '../hooks/useIngest';
 import { useMediaPlayer } from '../hooks/useMediaPlayer';
 import { usePrefs } from '../hooks/usePrefs';
-import { supportsMeetingCapture, supportsRecording, type RecorderMode } from '../hooks/useRecorder';
+import { supportsRecording } from '../hooks/useRecorder';
 import type { BackendState } from '../hooks/useBackendStatus';
 import { useI18n } from '../i18n';
 import { useLibrary } from '../state/library';
@@ -108,38 +107,26 @@ const ERROR_KEYS = {
   denied: 'recorder.errors.denied',
   noDevice: 'recorder.errors.noDevice',
   busy: 'recorder.errors.busy',
-  noSystemAudio: 'recorder.errors.noSystemAudio',
   failed: 'recorder.errors.failed',
 } as const;
 
 /**
- * Grabadora. Arriba, lo que se configura antes de empezar (qué grabar, idioma, micrófono); en el centro, el tiempo y la onda;
- * abajo, tres controles: pausa, grabar/parar y descartar.
+ * Grabadora con un micrófono. Arriba, lo que se configura antes de empezar (idioma y micrófono); en el centro, el tiempo y
+ * la onda; abajo, tres controles: pausa, grabar/parar y descartar.
  */
 function Recorder() {
   const { t } = useI18n();
   const { prefs, update } = usePrefs();
   const { phase, elapsed, error, notice, start, stop, pause, resume, discard, historyRef } = useRecording();
-  const [mode, setMode] = useState<RecorderMode>('mic');
   const live = phase === 'recording' || phase === 'paused';
   const paused = phase === 'paused';
   const waiting = phase === 'requesting';
   const canRecord = supportsRecording();
-  const canMeeting = supportsMeetingCapture();
   const state = waiting ? t('deck.waiting') : paused ? t('recorder.pausedState') : live ? t('recorder.recordingState') : t('deck.ready');
 
   return (
     <div className="recorder">
       <div className="recorder-top">
-        <Segmented<RecorderMode>
-          label={t('recorder.mode')}
-          value={mode}
-          onChange={(value) => setMode(value)}
-          options={[
-            { value: 'mic', label: <><Mic size={16} />{t('recorder.modes.mic')}</>, disabled: live },
-            { value: 'meeting', label: <><MonitorSpeaker size={16} />{t('recorder.modes.meeting')}</>, disabled: live || !canMeeting, title: canMeeting ? undefined : t('recorder.meetingUnsupported') },
-          ]}
-        />
         <LanguageSelect value={prefs.language} onChange={(language) => update({ language })} label={t('recorder.language')} disabled={live} />
       </div>
 
@@ -167,7 +154,7 @@ function Recorder() {
         <div className="control">
           <button
             className={`round round-rec ${live ? 'is-live' : ''}`}
-            onClick={live ? stop : () => void start(mode, prefs.language, prefs.micId)}
+            onClick={live ? stop : () => void start(prefs.language, prefs.micId)}
             disabled={waiting || !canRecord}
             aria-label={live ? t('recorder.stop') : t('recorder.start')}
           >
@@ -182,7 +169,7 @@ function Recorder() {
         </div>
       </div>
 
-      {!live && <p className="recorder-hint">{!canRecord ? t('recorder.errors.unsupported') : mode === 'meeting' ? t('recorder.hintMeeting') : t('recorder.hintMic')}</p>}
+      {!live && <p className="recorder-hint">{!canRecord ? t('recorder.errors.unsupported') : t('recorder.hintMic')}</p>}
 
       {notice === 'micFallback' && (
         <div className="banner banner-info" role="status">
