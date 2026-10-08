@@ -37,4 +37,4 @@ Las licencias de las dependencias transitivas se pueden listar con `pnpm license
 
 ## Datos y privacidad (relacionado, no de copyright)
 
-La carpeta local y el almacenamiento del navegador contienen grabaciones de reuniones. Antes de usar la herramienta con clientes reales hay que cumplir la normativa de protección de datos aplicable (por ejemplo RGPD): base legal, información a los participantes grabados, retención y borrado, y acuerdos con el proveedor de transcripción. Ver `docs/LOCAL-STORAGE.md` del backend.
+La carpeta local y el almacenamiento del navegador contienen grabaciones de reuniones. Antes de usar la herramienta con clientes reales hay que cumplir la normativa de protección de datos aplicable (por ejemplo RGPD): base legal, información a los participantes grabados, retención y borrado, y acuerdos con quien aloje el servidor de transcripción. El flujo de guardado y borrado está descrito en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).

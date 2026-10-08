@@ -5,8 +5,8 @@
  *
  *   pnpm api:check                       usa VITE_BACKEND_URL del .env
  *   pnpm api:check https://host:puerto   otra URL
- *   pnpm api:check ruta/openapi.json     un archivo (p. ej. ../Transcriptor Reuniones/docs/openapi.json), útil cuando la API
- *                                        en marcha todavía no tiene la última migración
+ *   pnpm api:check ruta/openapi.json     un archivo de contrato (p. ej. el docs/openapi.json del backend), útil cuando la
+ *                                        API no está en marcha o aún no tiene la última versión
  *
  * Termina con código 1 si algo no coincide, así que sirve también en CI.
  */

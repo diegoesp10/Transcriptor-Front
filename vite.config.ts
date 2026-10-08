@@ -7,7 +7,7 @@ const { version } = JSON.parse(readFileSync(new URL('./package.json', import.met
 
 /**
  * El proxy reenvía /api y /health al backend .NET. Dos motivos:
- *  1. La API no configura CORS: con proxy el navegador solo habla con su propio origen.
+ *  1. Sin CORS: con proxy el navegador solo habla con su propio origen.
  *  2. La API exige X-Api-Key. La añade el proxy (variable BACKEND_API_KEY, sin prefijo VITE_), así la clave no viaja en el
  *     bundle ni se ve en el navegador. En producción, haz lo mismo en el proxy inverso (nginx, IIS, YARP…).
  */
@@ -40,8 +40,9 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    // 5180 y no 5173 para poder tener a la vez abierto SyncForge Front. No hace falta que esté en los orígenes CORS de la API:
-    // el navegador solo habla con el proxy (mismo origen). strictPort: si está ocupado falla en vez de saltar a otro puerto.
+    // 5180 y no el 5173 por defecto de Vite, para no chocar con otros proyectos. No hace falta que esté en los orígenes CORS
+    // de la API: el navegador solo habla con el proxy (mismo origen). strictPort: si está ocupado falla en vez de saltar a
+    // otro puerto (se puede cambiar con --port).
     server: { port: 5180, strictPort: true, proxy },
     preview: { port: 4180, proxy },
   };

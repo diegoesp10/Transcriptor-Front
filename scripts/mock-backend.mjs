@@ -5,7 +5,7 @@
  * ("Hablante 1"…), límite de reintentos, estado de los motores y el límite de lecturas por minuto con 429 + Retry-After.
  *
  *   pnpm dev:mock                   mock + Vite apuntando a él (lo normal)
- *   pnpm mock                       solo el mock, en http://localhost:5290 (NO el 52611: ese es el de la API real)
+ *   pnpm mock                       solo el mock, en http://localhost:5290 (no en 52610/52611, los puertos de la API real)
  *   PORT=5080 pnpm mock             otro puerto
  *   MOCK_TIMING=chunk pnpm mock     simula un resultado antiguo (un solo tiempo por fragmento, sin hablantes)
  *   MOCK_NOT_READY=1 pnpm dev:mock   motores sin preparar: configuración ready=false y subidas con 503 WhisperModelMissing
