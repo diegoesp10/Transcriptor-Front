@@ -1,4 +1,4 @@
-import type { TranscriptSegment } from '../api/types';
+import type { TranscriptDto, TranscriptSegment } from '../api/types';
 
 /*
  * Hablantes y análisis local de la transcripción.
@@ -28,6 +28,22 @@ export function parseSpeaker(raw: string): ParsedSpeaker {
   return { chunk: null, label: raw, number: global ? Number(global[1]) : null };
 }
 
+/**
+ * El backend separa la identidad de la voz (`speakerId`: "Hablante 1") de lo que se muestra (`speaker`: "Diego Espina" si
+ * se presentó). La interfaz identifica las voces por `speaker` (colores, nombres que pone el usuario), así que aquí se
+ * deja en `speaker` la identidad y los nombres detectados aparte. Las transcripciones antiguas (sin `speakerId`) no cambian.
+ */
+export function normalizeTranscript(dto: TranscriptDto): { dto: TranscriptDto; detected: Record<string, string> } {
+  const detected: Record<string, string> = {};
+  for (const speaker of dto.speakers ?? []) if (speaker.name) detected[speaker.speakerId] = speaker.name;
+  const segments = dto.segments.map((segment) => {
+    if (segment.speakerId === undefined) return segment;
+    if (segment.speakerId && segment.speaker && segment.speaker !== segment.speakerId) detected[segment.speakerId] ??= segment.speaker;
+    return segment.speaker === segment.speakerId ? segment : { ...segment, speaker: segment.speakerId };
+  });
+  return { dto: { ...dto, segments }, detected };
+}
+
 /** Hablantes distintos en orden de aparición (la posición decide su color) */
 export function speakersOf(segments: TranscriptSegment[]): string[] {
   const seen = new Set<string>();
@@ -41,7 +57,10 @@ export function spansChunks(speakers: string[]): boolean {
 }
 
 export interface SpeakerNaming {
+  /** Nombres que ha puesto el usuario (solo en este navegador): mandan sobre todo lo demás */
   names: Record<string, string>;
+  /** Nombres que detectó el servidor porque la persona se presentó */
+  detected: Record<string, string>;
   /** "Voz {label}" traducido */
   voice: (label: string) => string;
   /** "Voz A · parte 2" traducido */
@@ -60,6 +79,8 @@ export function speakerName(raw: string | null, naming: SpeakerNaming): string {
   if (!raw) return naming.unknown;
   const custom = naming.names[raw]?.trim();
   if (custom) return custom;
+  const detected = naming.detected[raw];
+  if (detected) return detected;
   const { chunk, label, number } = parseSpeaker(raw);
   if (number != null) return naming.numbered(number);
   if (chunk == null) return label;

@@ -12,6 +12,7 @@ import { Loader } from '../components/Loader';
 import { MediaPlayer } from '../components/MediaPlayer';
 import { EmptyState } from '../components/EmptyState';
 import { EngineNotice } from '../components/EngineNotice';
+import { LiveProgress } from '../components/LiveProgress';
 import { ProcessingArt } from '../components/ProcessingArt';
 import { Segmented } from '../components/Segmented';
 import { StatusBadge } from '../components/StatusBadge';
@@ -28,7 +29,7 @@ import { apiErrorText, jobErrorText } from '../utils/errors';
 import { buildExport, EXPORT_FORMATS, exportFileName, plainText, type ExportFormat, type MarkdownLabels } from '../utils/exporters';
 import { formatDuration, formatLongDate } from '../utils/format';
 import { downloadBlob } from '../utils/media';
-import { analyze, speakerName, speakersOf, spansChunks, type SpeakerNaming } from '../utils/transcript';
+import { analyze, normalizeTranscript, speakerName, speakersOf, spansChunks, type SpeakerNaming } from '../utils/transcript';
 
 type Tab = 'transcript' | 'analysis';
 
@@ -38,7 +39,11 @@ export function Meeting({ id, navigate }: { id: string; navigate: (route: Route)
   const library = useLibrary();
   const toast = useToasts();
   const [media, setMedia] = useState<Blob | undefined>();
-  const [dto, setDto] = useState<TranscriptDto | undefined>();
+  const [rawDto, setDto] = useState<TranscriptDto | undefined>();
+  // Voces identificadas por speakerId y nombres detectados aparte (ver normalizeTranscript)
+  const normalized = useMemo(() => (rawDto ? normalizeTranscript(rawDto) : undefined), [rawDto]);
+  const dto = normalized?.dto;
+  const detected = normalized?.detected;
   const [load, setLoad] = useState<'idle' | 'loading' | 'error'>('idle');
   const [attempt, setAttempt] = useState(0);
   const [tab, setTab] = useState<Tab>('transcript');
@@ -94,13 +99,14 @@ export function Meeting({ id, navigate }: { id: string; navigate: (route: Route)
   const naming = useMemo<SpeakerNaming>(
     () => ({
       names: names ?? {},
+      detected: detected ?? {},
       voice: (label) => t('speaker.voice', { label }),
       voiceInPart: (label, part) => t('speaker.voicePart', { label, part }),
       numbered: (n) => t('speaker.numbered', { n }),
       unknown: t('speaker.unknown'),
       multiChunk: spansChunks(speakers),
     }),
-    [names, speakers, t],
+    [names, detected, speakers, t],
   );
   const nameOf = useCallback((raw: string | null) => speakerName(raw, naming), [naming]);
   const analysis = useMemo(
@@ -316,6 +322,9 @@ function StatePanel({ item }: { item: LibraryItem }) {
   const { t } = useI18n();
   const library = useLibrary();
   const progress = useItemProgress(item);
+
+  // En el servidor: progreso sincronizado (en directo si el backend lo ofrece)
+  if (item.status === 'Queued' || item.status === 'Processing') return <LiveProgress item={item} />;
 
   if (progress) {
     const percent = progress.fraction == null ? null : Math.round(progress.fraction * 100);

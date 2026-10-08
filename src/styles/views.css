@@ -600,6 +600,250 @@
   }
 }
 
+/* ── Progreso en directo de una transcripción ──────────────────────────────── */
+
+.live-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 0 24px;
+}
+
+.live-progress .live-head {
+  grid-column: 1 / -1;
+}
+
+.live-head .state-text .muted {
+  margin-bottom: 0;
+}
+
+.ring-icon {
+  color: var(--accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.live-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  min-height: 1.4em;
+  margin-bottom: 10px;
+  color: var(--label);
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.live-meta:empty {
+  display: none;
+}
+
+/* Indicador del canal: punto verde que late cuando llegan eventos del servidor */
+.live-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--label-2);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.live-chip i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--label-3);
+}
+
+.live-chip.is-live {
+  color: var(--green);
+}
+
+.live-chip.is-live i {
+  background: var(--green);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--green) 60%, transparent);
+  animation: live-beat 1.8s ease-out infinite;
+}
+
+@keyframes live-beat {
+  70% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Fases: lista vertical con una línea que une las marcas, como un seguimiento de envío */
+.live-steps {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.live-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 12px;
+  padding-bottom: 18px;
+}
+
+.live-step:last-child {
+  padding-bottom: 0;
+}
+
+.live-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 26px;
+  bottom: 2px;
+  left: 11px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--fill-2);
+}
+
+.live-step.is-done:not(:last-child)::before {
+  background: color-mix(in oklab, var(--green) 55%, transparent);
+}
+
+.live-step-mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--accent);
+}
+
+.live-step.is-done .live-step-mark {
+  background: var(--green);
+  color: #fff;
+}
+
+.live-step.is-pending .live-step-mark i {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--label-3);
+  border-radius: 50%;
+}
+
+.live-step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.live-step-text b {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.live-step.is-pending .live-step-text b {
+  color: var(--label-2);
+}
+
+.live-step.is-current .live-step-text b {
+  font-weight: 600;
+}
+
+.live-step-text small {
+  color: var(--label-2);
+  font-size: 13px;
+}
+
+.live-step-bar {
+  max-width: 260px;
+  margin-top: 6px;
+}
+
+.live-step-aside {
+  padding-top: 3px;
+  color: var(--label-2);
+  font-size: 13px;
+}
+
+/* Voces detectadas durante el procesamiento */
+.live-speakers {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.live-speakers li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  border-bottom: 0.5px solid var(--separator);
+  animation: live-in 0.5s var(--ease) both;
+}
+
+.live-speakers li:last-child {
+  border-bottom: 0;
+}
+
+.live-speakers li > i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--spk);
+}
+
+.live-speaker-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.live-speaker-text b {
+  font-weight: 600;
+}
+
+.live-speaker-text small {
+  color: var(--label-2);
+  font-size: 12.5px;
+}
+
+.speaker-detected {
+  color: var(--accent);
+}
+
+/* Las voces (y cualquier lista en directo) entran con un fundido; solo opacidad para no desplazar el contenido */
+@keyframes live-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.live-preview-empty {
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .live-progress {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-speakers li,
+  .live-chip.is-live i,
+  .ring-icon {
+    animation: none;
+  }
+}
+
 /* Transcripción */
 
 .transcript {

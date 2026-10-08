@@ -4,14 +4,20 @@
   "version": "0.1.0",
   "type": "module",
   "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "dev": "vite",
+    "dev:mock": "node scripts/dev-mock.mjs",
     "build": "tsc --noEmit && vite build",
+    "start": "node --env-file-if-exists=.env.production server/index.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "api:check": "node scripts/check-contract.mjs",
     "mock": "node scripts/mock-backend.mjs",
-    "dev:mock": "node scripts/dev-mock.mjs"
+    "docker:build": "docker build -t murmur .",
+    "docker:run": "docker run --rm -p 8080:8080 --env-file .env.production murmur"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

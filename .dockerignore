@@ -1,0 +1,17 @@
+# Solo entra en la imagen lo necesario para compilar. Nunca variables de entorno ni secretos.
+node_modules
+dist
+.git
+.gitignore
+.claude
+.vscode
+.idea
+.env
+.env.*
+*.local
+docs
+Dockerfile
+.dockerignore
+compose.yaml
+*.md
+!README.md

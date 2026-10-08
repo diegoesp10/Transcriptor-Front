@@ -1,0 +1,22 @@
+# Murmur en producción con Docker Compose.
+#
+#   cp .env.production.example .env.production   # y rellénalo (BACKEND_URL, BACKEND_API_KEY…)
+#   docker compose up -d --build
+#
+# La web queda en http://localhost:8080. Pon delante tu proxy con HTTPS (nginx, Caddy, Traefik, un balanceador…):
+# el micrófono y la carpeta local solo funcionan con HTTPS.
+
+services:
+  murmur:
+    build: .
+    image: murmur:latest
+    env_file: .env.production
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    # Si el backend corre en la misma máquina, fuera de Docker: BACKEND_URL=http://host.docker.internal:52611
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true

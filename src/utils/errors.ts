@@ -30,13 +30,13 @@ export function apiErrorText(error: unknown, t: Translate): string {
     case 403:
       return error.code === 'ClientTemporarilyBlocked' || error.retryAfter != null ? `${t('errors.blocked')} ${waitText(error.retryAfter, t)}` : t('errors.forbidden');
     case 404:
-      return t('errors.notFound');
+      return known ?? t('errors.notFound');
     case 409:
       return known ?? t('errors.conflict');
     case 413:
-      return t('errors.tooLarge');
+      return known ?? t('errors.tooLarge');
     case 415:
-      return t('errors.unsupported');
+      return known ?? t('errors.unsupported');
     case 429:
       return `${t(error.code === PAUSED_CODE ? 'errors.paused' : 'errors.rateLimited')} ${waitText(error.retryAfter, t)}`;
     case 503:

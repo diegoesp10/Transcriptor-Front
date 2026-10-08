@@ -6,6 +6,7 @@ import type { BackendState } from '../hooks/useBackendStatus';
 import { hrefOf, type Route } from '../state/route';
 import { isBusy, useLibrary } from '../state/library';
 import { useRecording } from '../state/recorder';
+import { APP_ENV, IS_PRODUCTION, envLabel } from '../utils/environment';
 
 interface Props {
   route: Route;
@@ -46,6 +47,11 @@ export function Navigation({ route, theme, onTheme, backend }: Props) {
           <AudioLines size={19} strokeWidth={2} />
         </span>
         <span className="brand-name">{t('app.name')}</span>
+        {!IS_PRODUCTION && (
+          <span className="env-badge" title={t('env.badgeHint', { env: envLabel(APP_ENV, t) })}>
+            {envLabel(APP_ENV, t)}
+          </span>
+        )}
       </a>
 
       <nav className="nav" aria-label={t('nav.label')}>

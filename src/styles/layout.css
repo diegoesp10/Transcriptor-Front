@@ -56,6 +56,20 @@
   letter-spacing: -0.02em;
 }
 
+/* Marca de entorno (solo fuera de producción): para no confundir datos de prueba con los reales */
+.env-badge {
+  flex: none;
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--orange) 18%, transparent);
+  color: color-mix(in oklab, var(--orange) 80%, var(--label));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 .nav {
   display: flex;
   flex-direction: column;
@@ -268,6 +282,7 @@ h1 em {
   }
 
   .brand-name,
+  .env-badge,
   .nav-label,
   .status-pill span {
     display: none;

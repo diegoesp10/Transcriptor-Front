@@ -6,15 +6,23 @@ import { readFileSync } from 'node:fs';
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string };
 
 /**
+ * Configuración de DESARROLLO (pnpm dev) y de compilación (pnpm build). En producción no se usa Vite: la compilación la
+ * sirve server/index.mjs, que hace lo mismo que este proxy con las variables de entorno del servidor.
+ *
  * El proxy reenvía /api y /health al backend .NET. Dos motivos:
  *  1. Sin CORS: con proxy el navegador solo habla con su propio origen.
  *  2. La API exige X-Api-Key. La añade el proxy (variable BACKEND_API_KEY, sin prefijo VITE_), así la clave no viaja en el
  *     bundle ni se ve en el navegador. En producción, haz lo mismo en el proxy inverso (nginx, IIS, YARP…).
  */
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
+  // .env, .env.[mode] y sus .local. VITE_BACKEND_URL se acepta por compatibilidad con los .env antiguos.
   const env = loadEnv(mode, process.cwd(), '');
+  const backendUrl = env.BACKEND_URL || env.VITE_BACKEND_URL || 'https://localhost:52610';
+  if (command === 'serve' && !env.BACKEND_API_KEY) {
+    console.warn('! Falta BACKEND_API_KEY (ver .env.development): el backend responderá 401 a todo lo de /api.');
+  }
   const proxyOptions = {
-    target: env.VITE_BACKEND_URL || 'https://localhost:52610',
+    target: backendUrl,
     changeOrigin: true,
     secure: false,
     // Las subidas pueden ser de gigas: sin límite de tiempo en el proxy

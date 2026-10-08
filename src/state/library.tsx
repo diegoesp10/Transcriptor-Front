@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ApiError, confirmLocalExport, currentPause, generateSummary, getLocalExport, getMeeting, getTranscript, retryMeeting, uploadMeeting } from '../api/client';
-import type { MeetingStatusDto, SummaryResponseDto, TranscriptDto } from '../api/types';
+import { ApiError, confirmLocalExport, currentPause, generateSummary, getLocalExport, getMeeting, getTranscript, retryMeeting, streamMeeting, uploadMeeting } from '../api/client';
+import type { MeetingProgressDto, MeetingStatusDto, SummaryResponseDto, TranscriptDto } from '../api/types';
 import * as idb from '../db/idb';
 import type { LibraryItem } from '../db/model';
 import { useI18n } from '../i18n';
@@ -77,6 +77,15 @@ const UPLOADS_PER_MINUTE = 3;
 const POLL_MIN_MS = 3000;
 const POLL_PER_JOB_MS = 2500;
 const ACTIVE = new Set(['Queued', 'Processing']);
+/**
+ * Flujos de progreso abiertos a la vez. El backend admite 2 por IP (y 8 en total): las demás reuniones en curso siguen
+ * con el sondeo, que ya trae la misma foto del progreso en `progress`.
+ */
+const MAX_STREAMS = 2;
+/** Tras un corte (sin estado final), se reconecta enseguida: el trabajo sigue y el servidor manda la foto actual */
+const STREAM_RECONNECT_MS = 2_000;
+/** Si el canal deja de responder sin avisar, el sondeo vuelve a cubrir esa reunión pasado este tiempo */
+const STREAM_STALE_MS = 12_000;
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const isGuid = (value: string) => GUID.test(value.trim());
@@ -84,7 +93,10 @@ export const isGuid = (value: string) => GUID.test(value.trim());
 /** Una subida o un trabajo del servidor sin terminar */
 export const isBusy = (item: LibraryItem) => item.status === 'uploading' || item.status === 'Queued' || item.status === 'Processing';
 
-function fromServer(dto: MeetingStatusDto): Pick<LibraryItem, 'status' | 'completedChunks' | 'totalChunks' | 'errorCode' | 'errorMessage' | 'retryCount' | 'meetingId' | 'temporaryExpiresAt'> {
+/** Lo que se guarda del estado de un trabajo, venga del estado (GET /meetings/{id}) o de una foto de progreso */
+type JobPatch = Pick<LibraryItem, 'status' | 'completedChunks' | 'totalChunks' | 'errorCode' | 'errorMessage' | 'retryCount'>;
+
+function fromServer(dto: MeetingStatusDto): JobPatch & Pick<LibraryItem, 'meetingId' | 'temporaryExpiresAt'> {
   return {
     status: dto.status,
     completedChunks: dto.completedChunks,
@@ -96,6 +108,46 @@ function fromServer(dto: MeetingStatusDto): Pick<LibraryItem, 'status' | 'comple
     temporaryExpiresAt: dto.temporaryExpiresAt ?? null,
   };
 }
+
+function fromProgress(progress: MeetingProgressDto): JobPatch {
+  return {
+    status: progress.status,
+    completedChunks: progress.completedChunks,
+    totalChunks: progress.totalChunks,
+    errorCode: progress.errorCode,
+    errorMessage: progress.errorMessage,
+    retryCount: progress.retryCount,
+  };
+}
+
+/**
+ * ¿Es esta foto más reciente que la que ya se tiene? Un reintento abre otra ejecución (retryCount sube y version vuelve a
+ * empezar); dentro de una misma ejecución manda version. Las fotos reconstruidas (runId null) se aceptan siempre.
+ */
+function isNewer(incoming: MeetingProgressDto, current: MeetingProgressDto | null): boolean {
+  if (!current) return true;
+  if (incoming.retryCount !== current.retryCount) return incoming.retryCount > current.retryCount;
+  if (incoming.runId && incoming.runId === current.runId) return incoming.version >= current.version;
+  return true;
+}
+
+/** Seguimiento en directo de una reunión en curso. Vive solo en memoria: no se guarda en IndexedDB. */
+export interface LiveJob {
+  /** stream: llegan eventos del servidor · poll: se consulta el estado cada pocos segundos */
+  channel: 'stream' | 'poll';
+  /** Última foto del progreso; null con un backend sin progreso en tiempo real (se deduce del estado) */
+  progress: MeetingProgressDto | null;
+  lastMessageAt: number;
+}
+
+const emptyLive = (): LiveJob => ({ channel: 'poll', progress: null, lastMessageAt: 0 });
+
+interface LiveContextValue {
+  live: Record<string, LiveJob>;
+  watch: (itemId: string) => () => void;
+}
+
+const LiveContext = createContext<LiveContextValue | null>(null);
 
 /** Milisegundos que quedan de la pausa impuesta por el servidor (0 si no hay) */
 const pauseLeft = () => Math.max(0, (currentPause()?.until ?? 0) - Date.now());
@@ -533,14 +585,146 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     })();
   }, [commit, create, locale, toast]);
 
-  // ── Sondeo del estado de los trabajos en el servidor ───────────────────────
+  // ── Estado de los trabajos en el servidor: canal en directo y sondeo ───────
 
-  const hasActiveJobs = items.some((item) => item.meetingId && ACTIVE.has(item.status));
+  /** Aplica un estado recibido del servidor (por sondeo o por el canal en directo) */
+  const applyStatus = useCallback(
+    async (itemId: string, next: JobPatch) => {
+      const item = itemsRef.current.find((candidate) => candidate.id === itemId);
+      if (!item?.meetingId || !ACTIVE.has(item.status)) return;
+      if (next.status === 'Completed') {
+        const transcript = await getTranscript(item.meetingId).catch(() => undefined);
+        if (transcript) await idb.saveTranscript(item.id, transcript).catch(() => undefined);
+        patch(item.id, next);
+        toast.push('success', tRef.current('library.ready', { name: item.name }));
+        void autoSave(item.id, item.name);
+        return;
+      }
+      // El canal manda una foto cada 2 s: solo se guarda en IndexedDB si cambia algo que se conserva
+      const changed = (Object.keys(next) as (keyof JobPatch)[]).some((key) => next[key] !== item[key]);
+      if (changed) patch(item.id, next);
+    },
+    [patch, toast, autoSave],
+  );
+
+  /** La reunión ya no existe en el servidor (base de datos reiniciada, copia eliminada…) */
+  const markGone = useCallback(
+    (itemId: string) => {
+      const item = itemsRef.current.find((candidate) => candidate.id === itemId);
+      if (item) patch(item.id, item.hasMedia ? { status: 'uploadFailed', meetingId: null } : { status: 'Failed', errorCode: 'MeetingNotFound' });
+    },
+    [patch],
+  );
+
+  const [live, setLive] = useState<Record<string, LiveJob>>({});
+  const liveRef = useRef(live);
+  liveRef.current = live;
+  const updateLive = useCallback((itemId: string, change: (current: LiveJob) => LiveJob) => {
+    setLive((all) => ({ ...all, [itemId]: change(all[itemId] ?? emptyLive()) }));
+  }, []);
+  /** Guarda una foto del progreso si es más reciente que la que hay (los latidos y las reconexiones repiten fotos) */
+  const takeProgress = useCallback(
+    (itemId: string, progress: MeetingProgressDto, channel: LiveJob['channel']) => {
+      if (!isNewer(progress, liveRef.current[itemId]?.progress ?? null)) return false;
+      liveRef.current = { ...liveRef.current, [itemId]: { ...(liveRef.current[itemId] ?? emptyLive()), progress } };
+      updateLive(itemId, (current) => ({ ...current, channel, progress, lastMessageAt: Date.now() }));
+      return true;
+    },
+    [updateLive],
+  );
+
+  /** Reuniones que alguien está mirando (la pantalla de la reunión): tienen prioridad para el canal en directo */
+  const [watched, setWatched] = useState<Record<string, number>>({});
+  const watch = useCallback((itemId: string) => {
+    setWatched((all) => ({ ...all, [itemId]: (all[itemId] ?? 0) + 1 }));
+    return () =>
+      setWatched(({ [itemId]: count = 1, ...rest }) => (count > 1 ? { ...rest, [itemId]: count - 1 } : rest));
+  }, []);
+
+  const activeIds = items.filter((item) => item.meetingId && ACTIVE.has(item.status)).map((item) => item.id);
+  const activeKey = activeIds.join(',');
+  // Prioridad: las que se están mirando y, después, las más antiguas (las primeras que terminarán)
+  const streamKey = [...activeIds]
+    .sort((a, b) => Number(Boolean(watched[b])) - Number(Boolean(watched[a])) || activeIds.indexOf(b) - activeIds.indexOf(a))
+    .slice(0, MAX_STREAMS)
+    .join(',');
+
+  const streams = useRef(new Map<string, { close: () => void }>());
+  /** Cuándo se puede volver a intentar el canal de una reunión que lo perdió */
+  const streamRetryAt = useRef(new Map<string, number>());
+  const [streamTick, setStreamTick] = useState(0);
+
+  useEffect(() => {
+    const wanted = new Set(streamKey ? streamKey.split(',') : []);
+    for (const [itemId, stream] of streams.current) {
+      if (!wanted.has(itemId)) {
+        stream.close();
+        streams.current.delete(itemId);
+        updateLive(itemId, (current) => ({ ...current, channel: 'poll' }));
+      }
+    }
+    for (const itemId of wanted) {
+      if (streams.current.has(itemId) || (streamRetryAt.current.get(itemId) ?? 0) > Date.now()) continue;
+      const item = itemsRef.current.find((candidate) => candidate.id === itemId);
+      if (!item?.meetingId) continue;
+      const stream = streamMeeting(item.meetingId, {
+        onOpen: () => updateLive(itemId, (current) => ({ ...current, channel: 'stream', lastMessageAt: Date.now() })),
+        onProgress: (progress) => {
+          updateLive(itemId, (current) => ({ ...current, channel: 'stream', lastMessageAt: Date.now() }));
+          if (takeProgress(itemId, progress, 'stream')) void applyStatus(itemId, fromProgress(progress));
+        },
+        onTerminal: (progress) => {
+          streams.current.delete(itemId);
+          takeProgress(itemId, progress, 'poll');
+          void applyStatus(itemId, fromProgress(progress));
+        },
+        onEnd: (reason, retryAfterMs) => {
+          streams.current.delete(itemId);
+          updateLive(itemId, (current) => ({ ...current, channel: 'poll' }));
+          if (reason === 'gone') return markGone(itemId);
+          // Sin el endpoint, el cliente no lo vuelve a intentar en unos minutos: mientras tanto, sondeo
+          const wait = reason === 'cut' ? STREAM_RECONNECT_MS : reason === 'rejected' ? Math.max(STREAM_RECONNECT_MS, retryAfterMs) : 5 * 60_000;
+          streamRetryAt.current.set(itemId, Date.now() + wait);
+          setTimeout(() => setStreamTick((tick) => tick + 1), wait + 50);
+        },
+      });
+      streams.current.set(itemId, stream);
+    }
+  }, [streamKey, streamTick, applyStatus, updateLive, takeProgress, markGone]);
+
+  // Cierra todos los flujos al salir
+  useEffect(() => {
+    const open = streams.current;
+    return () => {
+      for (const stream of open.values()) stream.close();
+      open.clear();
+    };
+  }, []);
+
+  // Lo que ya no está en curso deja de tener estado en directo
+  useEffect(() => {
+    const active = new Set(activeKey ? activeKey.split(',') : []);
+    setLive((all) => {
+      const stale = Object.keys(all).filter((itemId) => !active.has(itemId));
+      if (stale.length === 0) return all;
+      const next = { ...all };
+      for (const itemId of stale) delete next[itemId];
+      return next;
+    });
+  }, [activeKey]);
+
+  /** Con el canal en directo funcionando, el sondeo de esa reunión sobra */
+  const streaming = (itemId: string) => {
+    const job = liveRef.current[itemId];
+    return job?.channel === 'stream' && Date.now() - job.lastMessageAt < STREAM_STALE_MS;
+  };
+
+  const hasActiveJobs = activeIds.length > 0;
   useEffect(() => {
     if (!hasActiveJobs) return;
     let stopped = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const activeJobs = () => itemsRef.current.filter((candidate) => candidate.meetingId && ACTIVE.has(candidate.status));
+    const activeJobs = () => itemsRef.current.filter((candidate) => candidate.meetingId && ACTIVE.has(candidate.status) && !streaming(candidate.id));
 
     // Cada ronda consulta todos los trabajos y espera más cuantos más haya, así el ritmo total por minuto no crece
     const schedule = () => {
@@ -556,20 +740,12 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
           if (stopped || currentPause()) break;
           try {
             const dto = await getMeeting(item.meetingId!);
-            if (dto.status === 'Completed') {
-              const transcript = await getTranscript(dto.id).catch(() => undefined);
-              if (transcript) await idb.saveTranscript(item.id, transcript).catch(() => undefined);
-              patch(item.id, fromServer(dto));
-              toast.push('success', tRef.current('library.ready', { name: item.name }));
-              void autoSave(item.id, item.name);
-            } else {
-              patch(item.id, fromServer(dto));
-            }
+            // El estado trae la misma foto del progreso que el flujo (si el backend la ofrece)
+            if (dto.progress) takeProgress(item.id, dto.progress, 'poll');
+            await applyStatus(item.id, fromServer(dto));
           } catch (error) {
             // 404: el servidor ya no conoce esta reunión (p. ej. base de datos reiniciada). Sin red: se reintenta solo.
-            if (error instanceof ApiError && error.status === 404) {
-              patch(item.id, item.hasMedia ? { status: 'uploadFailed', meetingId: null } : { status: 'Failed', errorCode: 'NotFound' });
-            }
+            if (error instanceof ApiError && error.status === 404) markGone(item.id);
           }
         }
       } finally {
@@ -582,7 +758,10 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       stopped = true;
       clearTimeout(timer);
     };
-  }, [hasActiveJobs, patch, toast, autoSave]);
+    // `streaming` solo lee refs: no hace falta reiniciar el bucle cuando cambia
+  }, [hasActiveJobs, applyStatus, takeProgress, markGone]);
+
+  const liveValue = useMemo<LiveContextValue>(() => ({ live, watch }), [live, watch]);
 
   const value = useMemo<Library>(
     () => ({
@@ -611,7 +790,23 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     [items, ready, progress, saving, addMedia, transcribe, cancelUpload, retry, remove, rename, setLanguage, setSpeakerName, getBlob, getTranscriptFor, getSummary, requestSummary, saveLocally, downloadFiles, confirmServerDelete, openRemote, clearEverything],
   );
 
-  return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>;
+  return (
+    <LibraryContext.Provider value={value}>
+      <LiveContext.Provider value={liveValue}>{children}</LiveContext.Provider>
+    </LibraryContext.Provider>
+  );
+}
+
+/**
+ * Progreso en directo de una reunión en curso: fase, avance y texto que va saliendo. Mientras el componente está montado,
+ * la reunión tiene prioridad para el canal en directo (solo hay MAX_STREAMS a la vez).
+ */
+export function useLiveJob(itemId: string | undefined, watchIt = false): LiveJob | undefined {
+  const ctx = useContext(LiveContext);
+  if (!ctx) throw new Error('useLiveJob debe usarse dentro de <LibraryProvider>');
+  const { live, watch } = ctx;
+  useEffect(() => (watchIt && itemId ? watch(itemId) : undefined), [watchIt, itemId, watch]);
+  return itemId ? live[itemId] : undefined;
 }
 
 export function useLibrary(): Library {

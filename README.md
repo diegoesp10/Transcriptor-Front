@@ -7,6 +7,8 @@ Murmur es solo la interfaz. La transcripción la hace el backend **MeetingTransc
 ## Qué hace
 
 - **Grabar** desde el micrófono, o una **reunión online** (micrófono más el audio de una pestaña o de la pantalla, para Meet, Teams o Zoom en el navegador). Permite elegir y probar el micrófono antes de empezar y pausar, y recupera la grabación si se cierra la pestaña.
+- **Seguir la transcripción en directo**: fase actual con su porcentaje, audio procesado, tiempo que lleva y voces detectadas, con el [canal de progreso](docs/PROGRESO-EN-TIEMPO-REAL.md) del backend (o consultando el estado cada pocos segundos si no lo tiene).
+- **Nombres de las voces**: si alguien se presenta («me llamo Marta»), el servidor lo detecta y la transcripción lo muestra; se pueden cambiar a mano.
 - **Subir** audio y vídeo (`mp3`, `wav`, `m4a`, `flac`, `ogg`, `aac`, `mp4`, `mov`, `mkv`, `webm`; hasta 2 GB) con progreso y cancelación.
 - **Leer** la transcripción con el audio sincronizado: haz clic en una frase para escucharla, busca en el texto y ponle nombre a cada hablante.
 - **Analizar** en el navegador, sin IA: reparto de intervenciones, línea de tiempo, palabras clave, acuerdos y tareas, cifras y fechas a verificar y preguntas.
@@ -17,7 +19,7 @@ Murmur es solo la interfaz. La transcripción la hace el backend **MeetingTransc
 
 ## Requisitos
 
-- **Node.js 22** o superior (vale cualquier versión desde la 20.19).
+- **Node.js 22.12** o superior.
 - **pnpm 10**. `corepack enable` lo activa con la versión fijada en `package.json`.
 - Un navegador actual. Para elegir una carpeta de destino hace falta **Chrome o Edge**; en Firefox y Safari los archivos se ofrecen como descargas.
 - Para transcribir de verdad, una instancia de **MeetingTranscriber.Api** accesible desde tu equipo y su clave de API.
@@ -41,16 +43,12 @@ Abre <http://localhost:5180>. Las transcripciones son un texto de ejemplo, pero 
 ### Con el backend real
 
 1. Arranca MeetingTranscriber.Api siguiendo su propia documentación. En desarrollo escucha por defecto en `https://localhost:52610` y en `http://localhost:52611`.
-2. Crea tu configuración a partir del ejemplo:
-
-   ```bash
-   cp .env.example .env
-   ```
+2. La configuración de desarrollo ya viene en `.env.development`: apunta a `https://localhost:52610` con la clave pública de desarrollo del backend. Si tu backend está en otra URL, crea `.env.development.local` (no se sube al repositorio) con lo que cambie:
 
    | Variable | Para qué sirve |
    |---|---|
-   | `VITE_BACKEND_URL` | URL del backend. Por defecto, `https://localhost:52610`. |
-   | `BACKEND_API_KEY` | Clave que exige el backend (cabecera `X-Api-Key`). El ejemplo trae la clave pública **de desarrollo** del backend; en cualquier otro entorno pon la tuya. |
+   | `BACKEND_URL` | URL del backend. Por defecto, `https://localhost:52610`. |
+   | `BACKEND_API_KEY` | Clave que exige el backend (cabecera `X-Api-Key`). Por defecto, la de desarrollo. |
    | `VITE_MAX_FILE_MB` | Opcional. Tamaño máximo por archivo que acepta la interfaz (2000 por defecto, como el backend). |
 
 3. Arranca la interfaz:
@@ -64,7 +62,7 @@ Abre <http://localhost:5180>. Las transcripciones son un texto de ejemplo, pero 
 Para comprobar que la interfaz y el backend hablan el mismo contrato (se lee el OpenAPI que el backend publica en modo Development):
 
 ```bash
-pnpm api:check                              # usa VITE_BACKEND_URL
+pnpm api:check                              # usa BACKEND_URL
 pnpm api:check https://mi-servidor:52610    # otra URL
 pnpm api:check ruta/a/openapi.json          # un archivo de contrato
 ```
@@ -73,13 +71,15 @@ pnpm api:check ruta/a/openapi.json          # un archivo de contrato
 
 | Comando | Qué hace |
 |---|---|
-| `pnpm dev` | Servidor de desarrollo en <http://localhost:5180>, conectado al backend de `VITE_BACKEND_URL`. |
+| `pnpm dev` | Servidor de desarrollo en <http://localhost:5180>, conectado al backend de `BACKEND_URL`. |
 | `pnpm dev:mock` | Lo mismo, pero conectado al backend simulado (puerto 5290). Los argumentos extra van a Vite: `pnpm dev:mock --port 5181`. |
 | `pnpm mock` | Solo el backend simulado. |
 | `pnpm build` | Comprueba los tipos y compila para producción en `dist/`. |
-| `pnpm preview` | Sirve `dist/` en <http://localhost:4180> con el mismo proxy, para revisar la compilación. |
+| `pnpm start` | Servidor de producción (`server/index.mjs`) con la compilación de `dist/`. Se configura con variables de entorno o `.env.production`. |
+| `pnpm preview` | Sirve `dist/` con Vite en <http://localhost:4180>, para revisar la compilación rápidamente. |
 | `pnpm typecheck` | Solo la comprobación de tipos. |
 | `pnpm api:check` | Compara los tipos de la interfaz con el contrato OpenAPI del backend. |
+| `pnpm docker:build` / `pnpm docker:run` | Imagen Docker de producción, y arrancarla con `.env.production`. |
 
 El backend simulado acepta variables de entorno para probar casos concretos:
 
@@ -89,6 +89,7 @@ El backend simulado acepta variables de entorno para probar casos concretos:
 | `MOCK_NO_AI=1` | El resumidor no está disponible (503). |
 | `MOCK_READ_LIMIT=10` | Lecturas por minuto antes de responder 429 (60 por defecto, como el real). |
 | `MOCK_TIMING=chunk` | Transcripción en el formato antiguo, con tiempos por fragmento. |
+| `MOCK_NO_EVENTS=1` | Backend antiguo, sin progreso en tiempo real: la interfaz consulta el estado cada pocos segundos. |
 
 Un archivo con `fail` en el nombre falla la primera vez y funciona al reintentar.
 
@@ -97,7 +98,7 @@ Un archivo con `fail` en el nombre falla la primera vez y funciona al reintentar
 El navegador nunca habla directamente con la API. Todas las peticiones van a `/api` y `/health` en el mismo origen que la interfaz, y un proxy las reenvía al backend **añadiendo la cabecera `X-Api-Key`**. Así la clave no forma parte del JavaScript que descarga el navegador, y no hace falta configurar CORS.
 
 - En desarrollo, el proxy lo pone Vite (`vite.config.ts`).
-- En producción, lo pone tu servidor web (ver [Despliegue](#despliegue)).
+- En producción, lo pone el servidor incluido (`server/index.mjs`), que lee la URL y la clave de variables de entorno (ver [Despliegue](#despliegue)).
 
 La biblioteca de reuniones se guarda en el navegador (IndexedDB), porque la API no lista reuniones. El servidor conserva cada reunión unas 24 horas, y el destino final es una carpeta del usuario.
 
@@ -105,38 +106,31 @@ Los detalles (endpoints, sondeo, límites de peticiones, flujo de guardado y bor
 
 ## Despliegue
 
-`pnpm build` genera una web estática en `dist/`. Sírvela con cualquier servidor web que además reenvíe `/api` y `/health` al backend añadiendo la clave. Ejemplo con nginx:
+Hay dos entornos: **desarrollo** (`pnpm dev`, configurado en `.env.development`) y **producción** (el servidor de `server/index.mjs`, configurado con variables de entorno al arrancar). Una misma compilación sirve para cualquier entorno de producción o preproducción.
 
-```nginx
-server {
-    listen 443 ssl;
-    server_name murmur.example.com;
-    # ssl_certificate y ssl_certificate_key…
-
-    root /var/www/murmur/dist;
-    index index.html;
-
-    location / {
-        try_files $uri /index.html;
-    }
-
-    location ~ ^/(api|health) {
-        proxy_pass https://127.0.0.1:52610;
-        proxy_set_header X-Api-Key "CLAVE_DEL_BACKEND";
-        proxy_request_buffering off;   # subidas grandes en streaming
-        client_max_body_size 2g;
-        proxy_read_timeout 30m;        # el resumen puede tardar varios minutos
-        proxy_send_timeout 30m;
-    }
-}
+```bash
+pnpm build
+BACKEND_URL=https://api.interna.example.com BACKEND_API_KEY=… pnpm start   # http://localhost:8080
 ```
 
-Antes de publicarlo:
+O con Docker:
 
-- **Acceso**: con una sola clave compartida, cualquiera que llegue a la web puede usar la API. Si la vas a exponer fuera de tu red, pon delante una autenticación de usuarios (inicio de sesión en el proxy, VPN…).
-- **Límites por IP**: el backend cuenta las peticiones por IP de conexión. Si todos los usuarios llegan a través del mismo proxy, comparten límite; configura en el backend qué proxies son de confianza.
-- **HTTPS**: grabar con el micrófono y elegir una carpeta solo funcionan en HTTPS o en `localhost`.
-- Las rutas usan `#` (por ejemplo, `/#/biblioteca`), así que basta con servir `index.html`; no hacen falta reglas de reescritura.
+```bash
+cp .env.production.example .env.production   # y rellénalo
+docker compose up -d --build
+```
+
+| Variable | |
+|---|---|
+| `BACKEND_URL` | URL del backend (obligatoria). |
+| `BACKEND_API_KEY` | Clave del backend (obligatoria, secreto). La de desarrollo no se acepta. |
+| `APP_ENV` | `production` por defecto; otro valor (`staging`) muestra una marca en la interfaz. |
+| `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` | Usuario y contraseña para toda la web (recomendado). |
+| `PORT` | 8080 por defecto. |
+
+El servidor sirve la web comprimida y con caché, reenvía `/api` al backend con la clave en streaming (subidas de 2 GB y progreso en directo), añade cabeceras de seguridad, ofrece `/healthz` y `/readyz`, y no arranca si la configuración no es válida. Delante hace falta HTTPS (lo exigen el micrófono y la carpeta local).
+
+Todas las variables, plataformas (Docker, Azure, Cloud Run, Kubernetes…), el proxy HTTPS de delante, los límites por IP del backend y la lista de comprobación antes de publicar están en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
 ## Privacidad
 
@@ -146,7 +140,7 @@ Las grabaciones y las transcripciones son datos personales. Murmur guarda una co
 
 | Síntoma | Causa probable |
 |---|---|
-| La pastilla de estado dice «Sin conexión» | El backend no está arrancado o `VITE_BACKEND_URL` no apunta a él. Después de cambiar `.env`, reinicia `pnpm dev`. |
+| La pastilla de estado dice «Sin conexión» | El backend no está arrancado o `BACKEND_URL` no apunta a él. Después de cambiar `.env.development.local`, reinicia `pnpm dev`. |
 | «El servidor no acepta la clave de acceso» | `BACKEND_API_KEY` no coincide con la clave del backend. |
 | «El servidor no puede transcribir ahora» | Al backend le falta algún modelo o FFmpeg. Mira **Ajustes → Motores del servidor**. |
 | La pastilla dice «En espera» | El backend ha pedido bajar el ritmo de peticiones. Se reanuda sola. |
@@ -169,6 +163,7 @@ src/
   i18n/         textos en español e inglés (locales/es.json y en.json)
   styles/       tokens de diseño, base, maquetación, componentes y pantallas
 scripts/        backend simulado, arranque combinado y comprobación del contrato
+server/         servidor de producción (sin dependencias)
 docs/           documentación técnica
 public/         favicon y textos de licencias de terceros
 ```

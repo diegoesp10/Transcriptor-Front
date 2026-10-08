@@ -16,6 +16,7 @@ import type { TranscriptionConfigDto } from '../api/types';
 import { useEngine } from '../state/engine';
 import { useLibrary } from '../state/library';
 import { useToasts } from '../state/toasts';
+import { APP_ENV, envLabel } from '../utils/environment';
 import { codeText } from '../utils/errors';
 import { formatBytes } from '../utils/format';
 
@@ -200,7 +201,7 @@ export function Settings({ theme, onTheme, backend }: Props) {
       </div>
 
       <p className="version mono">
-        {t('app.name')} · v{__APP_VERSION__}
+        {t('app.name')} · v{__APP_VERSION__} · {envLabel(APP_ENV, t)}
       </p>
     </div>
   );

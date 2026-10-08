@@ -198,7 +198,7 @@
     "uploadingTitle": "Uploading the file",
     "uploadingHint": "Don't close this tab until the upload finishes.",
     "processingTitle": "Transcribing",
-    "processingHint": "The server works in chunks of about 10 minutes. You can close the tab: you'll see the result when you're back.",
+    "processingHint": "You can close the tab or keep using the app: you'll see the result when you're back.",
     "failedTitle": "Transcription failed",
     "failedHint": "Retrying processes the whole audio again from the start and uses the server's machine again.",
     "retryJob": "Retry transcription",
@@ -244,7 +244,8 @@
     "voice": "Voice {label}",
     "voicePart": "Voice {label} · part {part}",
     "unknown": "Undetermined speaker",
-    "numbered": "Speaker {n}"
+    "numbered": "Speaker {n}",
+    "detectedHint": "Name detected because they introduced themselves in the meeting. You can change it."
   },
   "analysis": {
     "disclaimer": "Automatic reading done in your browser with counts and text patterns, no AI. It can be wrong or miss things: always check it against the audio, especially names, figures and dates.",
@@ -405,7 +406,31 @@
       "ProviderQuotaExceeded": "Failed due to the old external provider quota. It is no longer used: retry with the local engines.",
       "ProviderSpendLimitExceeded": "Failed due to the old external provider spend limit. It is no longer used: retry with the local engines.",
       "ProviderRateLimited": "The old external provider rate-limited the requests. It is no longer used: retry with the local engines.",
-      "MissingProviderKey": "The old external provider key was missing. It is no longer used: retry with the local engines."
+      "MissingProviderKey": "The old external provider key was missing. It is no longer used: retry with the local engines.",
+      "MeetingNotFound": "The server no longer has this meeting.",
+      "RecordingNotFound": "The server no longer has this meeting's original file.",
+      "ResourceNotFound": "The server can't find what was requested.",
+      "InvalidRequest": "The server rejected the request as invalid.",
+      "RequestValidationFailed": "The server rejected the data sent.",
+      "UnsupportedMediaType": "The server doesn't accept this kind of upload.",
+      "UploadTooLarge": "The file exceeds the size the server accepts.",
+      "EmptyUpload": "The file is empty.",
+      "UnsupportedMediaFormat": "The server doesn't support this file format.",
+      "FileNameTooLong": "The file name is too long.",
+      "InvalidLanguage": "The language is not valid (it must be a two-letter code, such as es or en).",
+      "TranscriptEmpty": "The transcript is empty.",
+      "AuthenticationRequired": "The server doesn't accept the access key.",
+      "AccessDenied": "The server doesn't allow this action.",
+      "GlobalRequestLimited": "The server is receiving too many requests right now.",
+      "ServerConcurrencyLimited": "The server is busy with other requests.",
+      "RequestBurstLimited": "Too many requests in a row.",
+      "RequestConcurrencyLimited": "Too many requests open with the server at once.",
+      "RequestRateLimited": "Too many requests in a short time.",
+      "ClientTemporarilyBlocked": "The server has temporarily blocked this machine's requests.",
+      "HttpMethodNotAllowed": "The server doesn't allow this operation.",
+      "RequestBodyTooLarge": "The request is too large.",
+      "InvalidHttpRequest": "The server rejected the request.",
+      "HttpsRequired": "The server requires a secure connection (HTTPS)."
     }
   },
   "deck": {
@@ -517,7 +542,8 @@
     "testError": "That microphone couldn't be opened.",
     "level": "Input level",
     "unsupported": "This browser can't choose the microphone.",
-    "fallback": "The chosen microphone wasn't available: the system default was used for this recording."
+    "fallback": "The chosen microphone wasn't available: the system default was used for this recording.",
+    "listTitle": "Audio input"
   },
   "engine": {
     "title": "Server engines",
@@ -530,5 +556,74 @@
     "notReady": "The server can't transcribe right now.",
     "unknown": "Couldn't check the engines' state.",
     "help": "Everything runs on the server with local models: Whisper to transcribe, Community-1 to separate speakers and Ollama to summarize. Being ready doesn't guarantee every transcription will come out right."
+  },
+  "live": {
+    "steps": "Stages",
+    "uploaded": "File received",
+    "step": {
+      "queued": "Queued",
+      "preparing": "Preparing the audio",
+      "diarizing": "Separating the voices",
+      "transcribing": "Transcribing",
+      "naming": "Recognising names",
+      "saving": "Saving the result"
+    },
+    "detail": {
+      "queued": "Waiting for its turn on the server",
+      "preparing": "Preparing the audio",
+      "diarizing": "Analysing the voices across the whole meeting",
+      "transcribing": "Turning speech into text",
+      "naming": "Looking for introductions (\"my name is…\") to name the voices",
+      "saving": "Saving the transcript",
+      "Queued": "Waiting for its turn on the server",
+      "Processing": "The server restarted and is resuming the job",
+      "ExtractingAudio": "Extracting and normalising the audio",
+      "PreparingChunks": "Splitting the audio into chunks",
+      "LoadingDiarizationModel": "Loading the voice model",
+      "DetectingSpeakers": "Analysing the voices across the whole meeting",
+      "LoadingTranscriptionModel": "Loading the transcription model",
+      "Transcribing": "Turning speech into text",
+      "IdentifyingSpeakers": "Looking for introductions (\"my name is…\") to name the voices",
+      "SavingResults": "Saving the transcript",
+      "Completed": "Done",
+      "Failed": "It failed"
+    },
+    "substep": {
+      "Segmentation": "Detecting when someone speaks",
+      "SpeakerCounting": "Counting how many people speak",
+      "Embeddings": "Extracting each voice print",
+      "Clustering": "Grouping each voice's turns"
+    },
+    "chunk": "Chunk {n} of {total}",
+    "audio": "{done} of {total} of audio",
+    "elapsed": "Running for {time}",
+    "etaUnderMinute": "Less than a minute of transcription left",
+    "etaMinutes": {
+      "one": "About {count} minute of transcription left",
+      "other": "About {count} minutes of transcription left"
+    },
+    "channelLive": "Live",
+    "channelPoll": "Every few seconds",
+    "channelLiveHint": "The server sends progress as it happens.",
+    "channelPollHint": "The status is checked every few seconds (the server allows 2 live trackers at once, or the connection was lost).",
+    "speakersTitle": "Detected voices",
+    "speakersCount": {
+      "one": "{count} voice",
+      "other": "{count} voices"
+    },
+    "speakersPending": "They will show up as soon as the server finishes separating the voices.",
+    "speakersNone": "No voices detected yet.",
+    "introduced": "Introduced",
+    "introducedHint": "The name comes from an introduction in the meeting itself (\"my name is…\"). Check it in the transcript.",
+    "speakersNote": "Names only appear if the person clearly introduced themselves. You can name them yourself afterwards."
+  },
+  "env": {
+    "names": {
+      "development": "Development",
+      "staging": "Staging",
+      "test": "Test",
+      "production": "Production"
+    },
+    "badgeHint": "Environment: {env}. This is not production."
   }
 }

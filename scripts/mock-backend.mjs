@@ -11,6 +11,11 @@
  *   MOCK_NOT_READY=1 pnpm dev:mock   motores sin preparar: configuración ready=false y subidas con 503 WhisperModelMissing
  *   MOCK_READ_LIMIT=10 pnpm dev:mock lecturas por minuto y endpoint antes del 429 (60 por defecto, como el real)
  *
+ * Progreso en tiempo real como el backend real (docs/LIVE-PROGRESS.md del backend): GET /progress, `progress` dentro del
+ * estado y GET /events (SSE) con eventos `progress` y `heartbeat` cada 2 s, las 12 fases, porcentaje por fase y voces.
+ * El primer hablante se presenta («me llamo Marta»), así que la transcripción trae su nombre detectado.
+ *   MOCK_NO_EVENTS=1 pnpm dev:mock   backend antiguo, sin progreso en tiempo real: la interfaz usa el sondeo del estado
+ *
  * Incluye el flujo de carpeta local: copia temporal de 24 h (temporaryExpiresAt), manifiesto /local-export, original en
  * /recording, resumen simulado en /summary y confirmación que BORRA la reunión (después, todo responde 404).
  *   MOCK_NO_AI=1 pnpm dev:mock       el resumen responde 503 SummaryUnavailable, como un servidor con Ollama parado
@@ -34,11 +39,14 @@ const NOT_READY = process.env.MOCK_NOT_READY === '1';
 const READ_LIMIT = Number(process.env.MOCK_READ_LIMIT ?? 60);
 const MAX_RETRIES = 3;
 const SPEAKER_NUMBER = { A: 1, B: 2, C: 3 };
+const NO_EVENTS = process.env.MOCK_NO_EVENTS === '1';
+const HEARTBEAT_MS = 2_000;
+const NAMES = { es: 'Marta', en: 'Marta' };
 
 /** Guion de ejemplo: incluye importes, fechas, tareas y preguntas para que el análisis tenga algo que encontrar */
 const SCRIPTS = {
   es: [
-    ['A', 'Buenos días a todos, gracias por conectaros. Empezamos con el estado del contrato de la nave de Getafe.'],
+    ['A', 'Buenos días a todos, me llamo Marta y voy a moderar. Empezamos con el estado del contrato de la nave de Getafe.'],
     ['B', 'Buenos días. Hemos revisado la última versión y hay dos cláusulas que todavía no cuadran con lo acordado.'],
     ['A', '¿Cuáles son exactamente? Necesito saberlo antes de hablar con el cliente.'],
     ['B', 'La cláusula séptima sobre penalizaciones y la de revisión de precios. Propone un 3% anual, y nosotros habíamos hablado del 2%.'],
@@ -54,7 +62,7 @@ const SCRIPTS = {
     ['C', 'Voy a enviar el acta de esta reunión esta tarde para que la validéis.'],
   ],
   en: [
-    ['A', "Good morning everyone, thanks for joining. Let's start with the status of the warehouse contract."],
+    ['A', "Good morning everyone, my name is Marta and I'll chair today. Let's start with the status of the warehouse contract."],
     ['B', "Morning. We reviewed the latest draft and there are two clauses that still don't match what we agreed."],
     ['A', 'Which ones exactly? I need to know before I talk to the client.'],
     ['B', 'The penalties clause and the price review one. They propose 3% a year, and we had talked about 2%.'],
@@ -92,6 +100,46 @@ function overLimit(route) {
   reads.set(route, recent);
   return recent.length > READ_LIMIT ? Math.ceil((recent[0] + 60_000 - now) / 1000) : 0;
 }
+/** Voces detectadas y, tras la fase de nombres, el de quien se presentó */
+const speakersOf = (m) => {
+  if (!m.voices) return [];
+  return m.voices.map((speakerId) => {
+    const name = m.named && speakerId === 'Hablante 1' ? NAMES[m.language] ?? null : null;
+    return { speakerId, displayName: name ?? speakerId, name, nameSource: name ? 'SelfIntroduction' : null, evidenceSegmentIndices: name ? [0] : [] };
+  });
+};
+
+/** MeetingProgressResponse, como el del backend */
+const progressView = (m) => {
+  const terminal = m.status === 'Completed' || m.status === 'Failed';
+  const now = new Date();
+  return {
+    meetingId: m.id,
+    runId: m.run.runId,
+    version: m.run.version,
+    retryCount: m.retryCount,
+    processingCorrelationId: m.run.runId ? m.run.runId.slice(0, 16) : null,
+    status: m.status,
+    stage: terminal ? m.status : m.run.stage,
+    step: m.run.step,
+    message: m.run.stage,
+    stagePercent: m.run.percent,
+    completedChunks: m.completedChunks,
+    totalChunks: m.totalChunks,
+    currentChunk: m.run.currentChunk,
+    processedAudioSeconds: m.run.processed,
+    audioDurationSeconds: m.totalChunks > 0 ? m.totalChunks * CHUNK_SECONDS : null,
+    startedAt: m.run.startedAt,
+    updatedAt: m.run.updatedAt,
+    serverTime: now.toISOString(),
+    elapsedSeconds: m.run.startedAt ? Math.round(((terminal ? Date.parse(m.run.updatedAt) : now.getTime()) - Date.parse(m.run.startedAt)) / 100) / 10 : null,
+    errorCode: m.errorCode,
+    errorMessage: m.errorMessage,
+    isTerminal: terminal,
+    speakers: speakersOf(m),
+  };
+};
+
 const statusView = (m) => ({
   id: m.id,
   fileName: m.fileName,
@@ -104,7 +152,18 @@ const statusView = (m) => ({
   temporaryExpiresAt: m.temporaryExpiresAt,
   retryCount: m.retryCount,
   errorMessage: m.errorMessage,
+  ...(NO_EVENTS ? {} : { progress: progressView(m) }),
 });
+
+const newRun = () => ({ runId: null, version: 0, stage: 'Queued', step: null, percent: null, currentChunk: null, processed: null, startedAt: null, updatedAt: new Date().toISOString() });
+
+/** Suscriptores del flujo en directo por reunión: (foto) => void */
+const listeners = new Map();
+/** Cambia la fase (o su avance) y avisa a los flujos abiertos */
+function report(m, changes) {
+  Object.assign(m.run, changes, { version: m.run.version + 1, updatedAt: new Date().toISOString() });
+  for (const listener of listeners.get(m.id) ?? []) listener('progress', progressView(m));
+}
 
 function segmentsForChunk(m, index) {
   const script = SCRIPTS[m.language] ?? SCRIPTS.en;
@@ -121,7 +180,7 @@ function segmentsForChunk(m, index) {
   }));
 }
 
-/** Cola secuencial como el BackgroundService real: de uno en uno, fragmento a fragmento */
+/** Cola secuencial como el BackgroundService real: de uno en uno, con las mismas fases que ProcessMeeting */
 let working = false;
 async function pump() {
   if (working) return;
@@ -129,21 +188,52 @@ async function pump() {
   try {
     for (let next = [...meetings.values()].find((m) => m.status === 'Queued'); next; next = [...meetings.values()].find((m) => m.status === 'Queued')) {
       const m = next;
-      await sleep(STEP_MS * 0.7);
-      m.totalChunks = 3; // el real divide en fragmentos de ~10 min; aquí siempre 3 para ver el progreso
       m.status = 'Processing';
+      m.run.runId = randomUUID();
+      m.run.startedAt = new Date().toISOString();
+      report(m, { stage: 'ExtractingAudio', percent: null });
+      await sleep(STEP_MS * 0.4);
+      m.totalChunks = 3; // el real divide en fragmentos de ~10 min; aquí siempre 3 para ver el progreso
+      for (let p = 0; p <= 100; p += 50) {
+        report(m, { stage: 'PreparingChunks', percent: p });
+        await sleep(STEP_MS * 0.12);
+      }
+      report(m, { stage: 'LoadingDiarizationModel', percent: null });
+      await sleep(STEP_MS * 0.3);
+      for (const [index, step] of ['Segmentation', 'SpeakerCounting', 'Embeddings', 'Clustering'].entries()) {
+        report(m, { stage: 'DetectingSpeakers', step, percent: index * 25 });
+        await sleep(STEP_MS * 0.25);
+      }
+      m.voices = ['Hablante 1', 'Hablante 2', 'Hablante 3'];
+      report(m, { stage: 'LoadingTranscriptionModel', step: null, percent: null });
+      await sleep(STEP_MS * 0.3);
       for (let i = 0; i < m.totalChunks; i++) {
-        await sleep(STEP_MS);
         if (/fail/i.test(m.fileName) && !m.retried && i === 1) {
+          await sleep(STEP_MS * 0.5);
           m.status = 'Failed';
           m.errorCode = 'NoAudio';
           m.errorMessage = 'No se obtuvieron segmentos de voz transcritos.';
           break;
         }
+        // Callbacks de Whisper: el porcentaje avanza con el audio procesado, ponderado por la duración de los fragmentos
+        for (let tick = 1; tick <= 4; tick++) {
+          await sleep(STEP_MS / 4);
+          const processed = (i + tick / 4) * CHUNK_SECONDS;
+          report(m, { stage: 'Transcribing', currentChunk: i + 1, processed, percent: Math.round((processed / (m.totalChunks * CHUNK_SECONDS)) * 1000) / 10 });
+        }
         m.segments.push(...segmentsForChunk(m, i));
         m.completedChunks++;
+        report(m, {});
       }
-      if (m.status === 'Processing') m.status = 'Completed';
+      if (m.status === 'Processing') {
+        report(m, { stage: 'IdentifyingSpeakers', percent: null, currentChunk: null });
+        await sleep(STEP_MS * 0.4);
+        m.named = true;
+        report(m, { stage: 'SavingResults' });
+        await sleep(STEP_MS * 0.2);
+        m.status = 'Completed';
+      }
+      report(m, { currentChunk: null, step: null, percent: null });
     }
   } finally {
     working = false;
@@ -196,7 +286,7 @@ createServer(async (req, res) => {
     });
   }
 
-  const one = /^\/api\/meetings\/([0-9a-f-]{36})(\/transcript\.txt|\/transcript|\/retry|\/local-export\/confirm|\/local-export|\/recording|\/summary)?$/i.exec(path);
+  const one = /^\/api\/meetings\/([0-9a-f-]{36})(\/transcript\.txt|\/transcript|\/retry|\/events|\/progress|\/local-export\/confirm|\/local-export|\/recording|\/summary)?$/i.exec(path);
 
   if (req.method === 'POST' && path === '/api/meetings') {
     if (req.headers['content-type'] !== 'application/octet-stream') {
@@ -231,6 +321,9 @@ createServer(async (req, res) => {
       errorCode: null,
       errorMessage: null,
       retryCount: 0,
+      run: newRun(),
+      voices: null,
+      named: false,
       segments: [],
       bytes,
       body: bytes <= 50_000_000 ? Buffer.concat(parts) : null,
@@ -246,15 +339,50 @@ createServer(async (req, res) => {
 
   if (one) {
     const meeting = meetings.get(one[1].toLowerCase());
-    if (!meeting) {
-      res.writeHead(404);
-      return res.end();
-    }
+    if (!meeting) return problem(res, 404, null, 'MeetingNotFound');
     const [, , sub] = one;
     if (req.method === 'GET' && !sub) return json(res, 200, statusView(meeting));
+    if (req.method === 'GET' && (sub === '/events' || sub === '/progress') && NO_EVENTS) return problem(res, 404, null, 'ResourceNotFound');
+    if (req.method === 'GET' && sub === '/progress') return json(res, 200, progressView(meeting));
+    if (req.method === 'GET' && sub === '/events') {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' });
+      const send = (event, data) => {
+        const id = `${data.retryCount}:${data.runId ? data.runId.replaceAll('-', '') : 'snapshot'}:${data.version}`;
+        // El JSON se parte a propósito en dos escrituras: el cliente tiene que juntar los trozos de un mismo evento
+        const frame = `id: ${id}\nevent: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+        const cut = Math.floor(frame.length / 2);
+        res.write(frame.slice(0, cut));
+        res.write(frame.slice(cut));
+      };
+      let last = progressView(meeting);
+      send('progress', last);
+      if (last.isTerminal) return res.end();
+      const listener = (event, data) => {
+        last = data;
+        send(event, data);
+        if (data.isTerminal) {
+          cleanup();
+          res.end();
+        }
+      };
+      // Latido: la foto completa, aunque no haya cambios
+      const heartbeat = setInterval(() => send('heartbeat', progressView(meeting)), HEARTBEAT_MS);
+      const cleanup = () => {
+        clearInterval(heartbeat);
+        listeners.get(meeting.id)?.delete(listener);
+      };
+      if (!listeners.has(meeting.id)) listeners.set(meeting.id, new Set());
+      listeners.get(meeting.id).add(listener);
+      req.on('close', cleanup);
+      return;
+    }
     if (req.method === 'GET' && sub === '/transcript') {
       if (meeting.status !== 'Completed') return json(res, 409, { error: 'TranscriptNotCompleted' });
-      return json(res, 200, { id: meeting.id, language: meeting.language, timing: TIMING, speakerScope: TIMING === 'chunk' ? 'chunk' : 'meeting', segments: meeting.segments });
+      const speakers = speakersOf(meeting);
+      const shown = Object.fromEntries(speakers.map((speaker) => [speaker.speakerId, speaker.displayName]));
+      const segments =
+        TIMING === 'chunk' ? meeting.segments : meeting.segments.map((segment) => ({ ...segment, speakerId: segment.speaker, speaker: segment.speaker ? (shown[segment.speaker] ?? segment.speaker) : null }));
+      return json(res, 200, { id: meeting.id, language: meeting.language, timing: TIMING, speakerScope: TIMING === 'chunk' ? 'chunk' : 'meeting', segments, speakers: TIMING === 'chunk' ? [] : speakers });
     }
     if (req.method === 'GET' && sub === '/transcript.txt') {
       if (meeting.status !== 'Completed') {
@@ -331,7 +459,7 @@ createServer(async (req, res) => {
       }
       if (meeting.retryCount >= MAX_RETRIES) return json(res, 409, { error: 'MeetingRetryLimitExceeded' });
       if (NOT_READY) return json(res, 503, { error: 'WhisperModelMissing' });
-      Object.assign(meeting, { status: 'Queued', errorCode: null, errorMessage: null, completedChunks: 0, totalChunks: 0, segments: [], retried: true, retryCount: meeting.retryCount + 1 });
+      Object.assign(meeting, { status: 'Queued', run: newRun(), voices: null, named: false, errorCode: null, errorMessage: null, completedChunks: 0, totalChunks: 0, segments: [], retried: true, retryCount: meeting.retryCount + 1 });
       json(res, 202, { id: meeting.id, status: 'Queued' });
       void pump();
       return;

@@ -198,7 +198,7 @@
     "uploadingTitle": "Subiendo el archivo",
     "uploadingHint": "No cierres esta pestaña hasta que termine la subida.",
     "processingTitle": "Transcribiendo",
-    "processingHint": "El servidor trabaja por fragmentos de unos 10 minutos. Puedes cerrar la pestaña: al volver verás el resultado.",
+    "processingHint": "Puedes cerrar la pestaña o seguir usando la app: al volver verás el resultado.",
     "failedTitle": "La transcripción falló",
     "failedHint": "Reintentar vuelve a procesar el audio completo desde el principio y ocupa de nuevo el equipo del servidor.",
     "retryJob": "Reintentar transcripción",
@@ -244,7 +244,8 @@
     "voice": "Voz {label}",
     "voicePart": "Voz {label} · parte {part}",
     "unknown": "Hablante sin determinar",
-    "numbered": "Hablante {n}"
+    "numbered": "Hablante {n}",
+    "detectedHint": "Nombre detectado porque se presentó en la reunión. Puedes cambiarlo."
   },
   "analysis": {
     "disclaimer": "Lectura automática hecha en tu navegador con recuentos y patrones de texto, sin IA. Puede fallar o dejarse cosas: compruébalo siempre con el audio, sobre todo nombres, cifras y fechas.",
@@ -405,7 +406,31 @@
       "ProviderQuotaExceeded": "Falló por la cuota del antiguo proveedor externo. Ya no se usa: reintenta con los motores locales.",
       "ProviderSpendLimitExceeded": "Falló por el límite de gasto del antiguo proveedor externo. Ya no se usa: reintenta con los motores locales.",
       "ProviderRateLimited": "El antiguo proveedor externo limitó las peticiones. Ya no se usa: reintenta con los motores locales.",
-      "MissingProviderKey": "Faltaba la clave del antiguo proveedor externo. Ya no se usa: reintenta con los motores locales."
+      "MissingProviderKey": "Faltaba la clave del antiguo proveedor externo. Ya no se usa: reintenta con los motores locales.",
+      "MeetingNotFound": "El servidor ya no tiene esta reunión.",
+      "RecordingNotFound": "El servidor ya no tiene el archivo original de esta reunión.",
+      "ResourceNotFound": "El servidor no encuentra lo que se ha pedido.",
+      "InvalidRequest": "El servidor rechazó la petición por no ser válida.",
+      "RequestValidationFailed": "El servidor rechazó los datos enviados.",
+      "UnsupportedMediaType": "El servidor no acepta este tipo de envío.",
+      "UploadTooLarge": "El archivo supera el tamaño que acepta el servidor.",
+      "EmptyUpload": "El archivo está vacío.",
+      "UnsupportedMediaFormat": "El servidor no admite este formato de archivo.",
+      "FileNameTooLong": "El nombre del archivo es demasiado largo.",
+      "InvalidLanguage": "El idioma indicado no es válido (tiene que ser un código de dos letras, como es o en).",
+      "TranscriptEmpty": "La transcripción está vacía.",
+      "AuthenticationRequired": "El servidor no acepta la clave de acceso.",
+      "AccessDenied": "El servidor no permite esta acción.",
+      "GlobalRequestLimited": "El servidor está recibiendo demasiadas peticiones ahora mismo.",
+      "ServerConcurrencyLimited": "El servidor está ocupado con otras peticiones.",
+      "RequestBurstLimited": "Demasiadas peticiones seguidas.",
+      "RequestConcurrencyLimited": "Hay demasiadas peticiones abiertas a la vez con el servidor.",
+      "RequestRateLimited": "Demasiadas peticiones en poco tiempo.",
+      "ClientTemporarilyBlocked": "El servidor ha bloqueado temporalmente las peticiones de este equipo.",
+      "HttpMethodNotAllowed": "El servidor no admite esta operación.",
+      "RequestBodyTooLarge": "La petición es demasiado grande.",
+      "InvalidHttpRequest": "El servidor rechazó la petición.",
+      "HttpsRequired": "El servidor exige una conexión segura (HTTPS)."
     }
   },
   "deck": {
@@ -517,7 +542,8 @@
     "testError": "No se pudo abrir ese micrófono.",
     "level": "Nivel de entrada",
     "unsupported": "Este navegador no permite elegir el micrófono.",
-    "fallback": "El micrófono elegido no estaba disponible: se ha grabado con el predeterminado del sistema."
+    "fallback": "El micrófono elegido no estaba disponible: se ha grabado con el predeterminado del sistema.",
+    "listTitle": "Entrada de audio"
   },
   "engine": {
     "title": "Motores del servidor",
@@ -530,5 +556,74 @@
     "notReady": "El servidor no puede transcribir ahora.",
     "unknown": "No se pudo consultar el estado de los motores.",
     "help": "Todo se procesa en el servidor con modelos locales: Whisper para transcribir, Community-1 para separar hablantes y Ollama para resumir. Que estén listos no garantiza que cada transcripción salga bien."
+  },
+  "live": {
+    "steps": "Fases",
+    "uploaded": "Archivo recibido",
+    "step": {
+      "queued": "En cola",
+      "preparing": "Preparando el audio",
+      "diarizing": "Separando las voces",
+      "transcribing": "Transcribiendo",
+      "naming": "Reconociendo nombres",
+      "saving": "Guardando el resultado"
+    },
+    "detail": {
+      "queued": "Esperando su turno en el servidor",
+      "preparing": "Preparando el audio",
+      "diarizing": "Analizando las voces de toda la reunión",
+      "transcribing": "Convirtiendo la voz en texto",
+      "naming": "Buscando presentaciones («me llamo…») para poner nombre a las voces",
+      "saving": "Guardando la transcripción",
+      "Queued": "Esperando su turno en el servidor",
+      "Processing": "El servidor se reinició y está retomando el trabajo",
+      "ExtractingAudio": "Extrayendo y normalizando el audio",
+      "PreparingChunks": "Dividiendo el audio en fragmentos",
+      "LoadingDiarizationModel": "Cargando el modelo de voces",
+      "DetectingSpeakers": "Analizando las voces de toda la reunión",
+      "LoadingTranscriptionModel": "Cargando el modelo de transcripción",
+      "Transcribing": "Convirtiendo la voz en texto",
+      "IdentifyingSpeakers": "Buscando presentaciones («me llamo…») para poner nombre a las voces",
+      "SavingResults": "Guardando la transcripción",
+      "Completed": "Terminado",
+      "Failed": "Ha fallado"
+    },
+    "substep": {
+      "Segmentation": "Detectando cuándo habla alguien",
+      "SpeakerCounting": "Contando cuántas personas hablan",
+      "Embeddings": "Extrayendo la huella de cada voz",
+      "Clustering": "Agrupando las intervenciones de cada voz"
+    },
+    "chunk": "Fragmento {n} de {total}",
+    "audio": "{done} de {total} de audio",
+    "elapsed": "Lleva {time}",
+    "etaUnderMinute": "Queda menos de un minuto de transcripción",
+    "etaMinutes": {
+      "one": "Queda alrededor de {count} minuto de transcripción",
+      "other": "Quedan unos {count} minutos de transcripción"
+    },
+    "channelLive": "En directo",
+    "channelPoll": "Cada pocos segundos",
+    "channelLiveHint": "El servidor envía el progreso al momento.",
+    "channelPollHint": "Se consulta el estado cada pocos segundos (el servidor admite 2 seguimientos en directo a la vez, o se ha perdido la conexión).",
+    "speakersTitle": "Voces detectadas",
+    "speakersCount": {
+      "one": "{count} voz",
+      "other": "{count} voces"
+    },
+    "speakersPending": "Aparecerán en cuanto el servidor termine de separar las voces.",
+    "speakersNone": "No se han detectado voces todavía.",
+    "introduced": "Se presentó",
+    "introducedHint": "El nombre sale de una presentación en la propia reunión («me llamo…»). Compruébalo en la transcripción.",
+    "speakersNote": "Los nombres solo aparecen si la persona se presentó con claridad. Después podrás ponérselos tú."
+  },
+  "env": {
+    "names": {
+      "development": "Desarrollo",
+      "staging": "Preproducción",
+      "test": "Pruebas",
+      "production": "Producción"
+    },
+    "badgeHint": "Entorno: {env}. No es el de producción."
   }
 }

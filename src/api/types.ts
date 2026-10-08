@@ -4,10 +4,12 @@
  * `pnpm api:check` compara este archivo con el OpenAPI del backend en marcha.
  *
  *   MeetingStatusResponse  -> MeetingStatusDto   POST /api/meetings (202) · GET /api/meetings/{id}
+ *   MeetingProgressResponse -> MeetingProgressDto GET /api/meetings/{id}/progress · eventos de /events · status.progress
  *   TranscriptResponse     -> TranscriptDto      GET /api/meetings/{id}/transcript
+ *   SpeakerIdentity        -> SpeakerIdentityDto voces de la transcripción y del progreso
  *   RetryResponse          -> RetryDto           POST /api/meetings/{id}/retry (202)
  *   ErrorResponse          -> ErrorDto           409 de /transcript
- *   ProblemDetails         -> ProblemDetailsDto  400 (validación) y 500
+ *   ApiProblem / ProblemDetails -> ProblemDetailsDto  errores HTTP con `code` y `correlationId`
  *   LocalExportResponse    -> LocalExportDto     GET /api/meetings/{id}/local-export
  *   MeetingSummaryResponse -> SummaryResponseDto POST /api/meetings/{id}/summary
  *   ConfirmLocalExportRequest -> ConfirmExportDto POST /api/meetings/{id}/local-export/confirm (204)
@@ -35,6 +37,8 @@ export interface MeetingStatusDto {
   retryCount: number;
   /** Explicación controlada del fallo, en español; nunca es el mensaje bruto del motor */
   errorMessage: string | null;
+  /** Foto del progreso (la misma que emite /events). Ausente en versiones del backend sin progreso en tiempo real. */
+  progress?: MeetingProgressDto | null;
 }
 
 /** Domain.TranscriptSegment */
@@ -43,11 +47,27 @@ export interface TranscriptSegment {
   endSeconds: number;
   text: string;
   /**
-   * speakerScope "meeting": "Hablante 1", "Hablante 2"… estables en toda la reunión.
-   * speakerScope "chunk" (resultados antiguos): "chunk-{n}:{etiqueta}", local a cada fragmento de ~10 min.
+   * Lo que se muestra: el nombre detectado si la persona se presentó («me llamo Diego»), o la etiqueta de la voz.
    * null: atribución incierta.
    */
   speaker: string | null;
+  /**
+   * Identidad estable de la voz: "Hablante 1", "Hablante 2"… en toda la reunión. Es la que identifica a la voz (nombres
+   * propios del usuario, colores). Ausente en transcripciones antiguas, donde `speaker` es "chunk-{n}:{etiqueta}".
+   */
+  speakerId?: string | null;
+}
+
+/** Voz de la reunión y, si se presentó, su nombre */
+export interface SpeakerIdentityDto {
+  speakerId: string;
+  /** Lo que se muestra: `name` si existe, si no la etiqueta */
+  displayName: string;
+  /** Nombre detectado en una presentación propia; null si no hay evidencia clara */
+  name: string | null;
+  nameSource: 'SelfIntroduction' | null;
+  /** Segmentos (base cero) donde se presentó */
+  evidenceSegmentIndices: number[];
 }
 
 export interface RetryDto {
@@ -82,6 +102,66 @@ export interface TranscriptDto {
   /** "meeting": hablantes globales de la diarización local · "chunk": resultados antiguos con etiquetas por fragmento */
   speakerScope: 'meeting' | 'chunk';
   segments: TranscriptSegment[];
+  /** Voces y nombres detectados. Ausente en transcripciones guardadas antes de que el backend lo ofreciera. */
+  speakers?: SpeakerIdentityDto[];
+}
+
+/*
+ * Progreso en tiempo real. El mismo DTO llega por tres vías: GET /progress, la propiedad `progress` del estado y el flujo
+ * SSE GET /events (eventos `progress` y `heartbeat`, cada 2 s). Ver docs/LIVE-PROGRESS.md del backend.
+ */
+
+/** Fases en el orden en que las recorre el worker. Processing = estado reconstruido tras un reinicio, sin detalle. */
+export type ProcessingStage =
+  | 'Queued'
+  | 'Processing'
+  | 'ExtractingAudio'
+  | 'PreparingChunks'
+  | 'LoadingDiarizationModel'
+  | 'DetectingSpeakers'
+  | 'LoadingTranscriptionModel'
+  | 'Transcribing'
+  | 'IdentifyingSpeakers'
+  | 'SavingResults'
+  | 'Completed'
+  | 'Failed';
+
+/** Pasos de la detección de hablantes */
+export type ProcessingStep = 'Segmentation' | 'SpeakerCounting' | 'Embeddings' | 'Clustering';
+
+export interface MeetingProgressDto {
+  meetingId: string;
+  /** Ejecución: un reintento abre otra y reinicia `version`. null en fotos reconstruidas. */
+  runId: string | null;
+  /** Crece con cada cambio dentro de una ejecución: sirve para descartar fotos antiguas */
+  version: number;
+  retryCount: number;
+  /** Para buscar el fallo en GET /api/errors (diagnóstico del operador) */
+  processingCorrelationId: string | null;
+  status: JobStatus;
+  stage: ProcessingStage;
+  step: ProcessingStep | null;
+  /** Texto de la fase, en español, redactado por el servidor */
+  message: string;
+  /** Avance de la FASE actual, 0‑100; null si no se puede medir (indicador indeterminado). No es un avance total. */
+  stagePercent: number | null;
+  completedChunks: number;
+  totalChunks: number;
+  /** Fragmento en curso, contando desde 1 */
+  currentChunk: number | null;
+  /** Segundos de audio ya transcritos y duración total (sin contar dos veces el solapamiento entre fragmentos) */
+  processedAudioSeconds: number | null;
+  audioDurationSeconds: number | null;
+  startedAt: string | null;
+  updatedAt: string;
+  serverTime: string;
+  /** Tiempo de procesamiento hasta ahora (o total, si ya terminó) */
+  elapsedSeconds: number | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+  isTerminal: boolean;
+  /** Voces detectadas hasta ahora, con su nombre si se presentaron */
+  speakers: SpeakerIdentityDto[];
 }
 
 /** GET /api/transcription/configuration: motores locales del servidor, sin rutas ni secretos */

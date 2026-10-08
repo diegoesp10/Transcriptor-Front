@@ -718,9 +718,40 @@ input:focus-visible {
 }
 
 .mic-picker {
-  overflow: hidden;
+  container-type: inline-size;
   border-radius: 14px;
   background: var(--surface-2);
+}
+
+.mic-picker .list-row {
+  position: relative;
+  flex-wrap: wrap;
+}
+
+/* Sin sitio (móvil o columna estrecha): el selector baja a su propia línea a todo el ancho y el menú ocupa la tarjeta */
+@container (max-width: 440px) {
+  .mic-picker .mic-select {
+    position: static;
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+
+  .mic-picker .mic-select .picker-btn {
+    width: 100%;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .mic-picker .mic-select .picker-value {
+    flex: 1;
+    text-align: left;
+  }
+
+  .mic-picker .mic-select .mic-menu {
+    right: 8px;
+    left: 8px;
+    width: auto;
+  }
 }
 
 .mic-picker > * + * {
@@ -732,11 +763,103 @@ input:focus-visible {
   background: transparent;
 }
 
+/* Botón de valor de un menú emergente: cápsula gris con el valor y las flechas arriba/abajo de los menús del sistema */
+.picker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  height: 34px;
+  padding: 0 10px 0 12px;
+  border-radius: 17px;
+  background: var(--fill);
+  color: var(--label);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s var(--ease);
+}
+
+.picker-btn:hover:not(:disabled),
+.picker-btn[aria-expanded='true'] {
+  background: var(--fill-2);
+}
+
+.picker-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.picker-btn:disabled {
+  opacity: 0.5;
+}
+
+.picker-btn > svg {
+  flex: none;
+  color: var(--accent);
+}
+
+.picker-btn > svg:last-child {
+  color: var(--label-2);
+}
+
+.picker-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mic-select {
+  min-width: 0;
+  max-width: 58%;
+}
+
+.mic-menu {
+  width: min(340px, calc(100vw - 32px));
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+}
+
+/* En el menú se lee el nombre entero del dispositivo, aunque ocupe dos líneas */
+.mic-menu .menu-item b {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Opción elegida: marca a la derecha (en los menús del sistema la marca va a la izquierda; aquí el icono ocupa ese sitio) */
+.menu-item > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-item b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-check {
+  visibility: hidden;
+}
+
+.menu-item.is-current .menu-check {
+  visibility: visible;
+}
+
+.menu-item.is-current b {
+  font-weight: 600;
+}
+
 .mic-test {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
-  padding: 10px 14px;
+  gap: 10px 14px;
+  padding: 12px 14px;
+}
+
+.mic-test .btn {
+  flex: none;
 }
 
 .mic-test-state {
@@ -745,29 +868,47 @@ input:focus-visible {
   font-size: 12.5px;
 }
 
-/* Medidor de nivel: una cápsula que se llena con la voz */
+.mic-test-state:empty {
+  display: none;
+}
+
+/* Medidor de nivel por segmentos: cada uno se enciende cuando el nivel pasa de su posición (--at) */
 .level {
-  position: relative;
-  flex: 0 1 160px;
-  height: 8px;
-  overflow: hidden;
-  border-radius: 4px;
+  --level: 0;
+  display: flex;
+  flex: 1 1 180px;
+  gap: 3px;
+  max-width: 320px;
+  height: 14px;
+}
+
+.level i {
+  flex: 1;
+  border-radius: 2px;
   background: var(--fill-2);
+  position: relative;
+  overflow: hidden;
 }
 
-.level-fill {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 4px;
+.level i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--green);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: background 0.2s;
+  /* 0 por debajo del nivel, 1 por encima: un interruptor hecho con aritmética, sin JavaScript por segmento */
+  opacity: clamp(0, (var(--level) - var(--at)) * 1000, 1);
 }
 
-.level-fill[data-hot='true'] {
+.level i[data-zone='high']::after {
+  background: var(--orange);
+}
+
+.level i[data-zone='peak']::after {
   background: var(--red);
+}
+
+.level:not(.is-live) i {
+  opacity: 0.6;
 }
 
 /* ── Grabadora ─────────────────────────────────────────────────────────────── */

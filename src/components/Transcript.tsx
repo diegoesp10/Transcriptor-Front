@@ -1,5 +1,5 @@
 import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { Check, ChevronDown, ChevronUp, Info, Pencil, Search, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Info, Pencil, Search, Sparkles, X } from 'lucide-react';
 import type { TranscriptDto, TranscriptSegment } from '../api/types';
 import { useI18n } from '../i18n';
 import { Panel } from './Panel';
@@ -256,10 +256,12 @@ function SpeakerList({ speakers, naming, onRename }: { speakers: string[]; namin
                   setDraft(naming.names[speaker] ?? '');
                   setEditing(speaker);
                 }}
-                title={t('transcript.renameSpeaker')}
+                title={!naming.names[speaker] && naming.detected[speaker] ? t('speaker.detectedHint') : t('transcript.renameSpeaker')}
               >
                 <i aria-hidden />
                 {speakerName(speaker, naming)}
+                {/* Nombre que dio el servidor porque la persona se presentó (mientras el usuario no ponga otro) */}
+                {!naming.names[speaker] && naming.detected[speaker] && <Sparkles size={12} className="speaker-detected" aria-label={t('speaker.detectedHint')} />}
                 <Pencil size={12} aria-hidden />
               </button>
             )}

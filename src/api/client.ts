@@ -1,4 +1,16 @@
-import type { ConfirmExportDto, ErrorDto, LocalArtifactDto, LocalExportDto, MeetingStatusDto, ProblemDetailsDto, RetryDto, SummaryResponseDto, TranscriptDto, TranscriptionConfigDto } from './types';
+import type {
+  ConfirmExportDto,
+  ErrorDto,
+  LocalArtifactDto,
+  LocalExportDto,
+  MeetingProgressDto,
+  MeetingStatusDto,
+  ProblemDetailsDto,
+  RetryDto,
+  SummaryResponseDto,
+  TranscriptDto,
+  TranscriptionConfigDto,
+} from './types';
 
 /**
  * Cliente de la API. Todas las rutas son relativas: en desarrollo las atiende el proxy de Vite, que añade X-Api-Key y
@@ -38,6 +50,7 @@ export class ApiError extends Error {
 /** Código local para las peticiones que ni se envían porque el cliente está en pausa */
 export const PAUSED_CODE = 'ClientPaused';
 const BLOCKED_CODE = 'ClientTemporarilyBlocked';
+const CONCURRENCY_CODE = 'RequestConcurrencyLimited';
 
 export interface ApiPause {
   /** Date.now() hasta el que no se envía nada */
@@ -102,7 +115,9 @@ function toApiError(status: number, header: (name: string) => string | null, tex
     correlationId: (typeof body?.correlationId === 'string' ? body.correlationId : null) ?? header('X-Correlation-ID'),
     retryAfter: retryAfterOf(header('Retry-After')),
   });
-  if (status === 429) startPause(error.retryAfter ?? 60, false);
+  // RequestConcurrencyLimited (demasiadas peticiones abiertas a la vez, p. ej. un tercer flujo de progreso) no penaliza la
+  // IP ni frena el resto: falla solo esa petición. Los demás 429 son de ritmo y paran todo durante Retry-After.
+  if (status === 429 && code !== CONCURRENCY_CODE) startPause(error.retryAfter ?? 60, false);
   else if (status === 403 && (code === BLOCKED_CODE || error.retryAfter != null)) startPause(error.retryAfter ?? 120, true);
   return error;
 }
@@ -192,6 +207,135 @@ export async function confirmLocalExport(id: string, signal?: AbortSignal): Prom
     body: JSON.stringify(body),
     signal,
   });
+}
+
+// ── Progreso en tiempo real ───────────────────────────────────────────────────
+
+/** Foto actual del progreso (la misma que emite el flujo). Para consultas puntuales, p. ej. tras un corte. */
+export async function getProgress(id: string, signal?: AbortSignal): Promise<MeetingProgressDto> {
+  return (await request(`/api/meetings/${id}/progress`, { signal })).json();
+}
+
+/**
+ * Por qué terminó un flujo sin llegar a un estado final:
+ *  missing   el backend no tiene /events (versión antigua): no se vuelve a intentar en un rato
+ *  gone      la reunión ya no existe en el servidor (404 MeetingNotFound)
+ *  rejected  401, 403, 429 (p. ej. más de 2 flujos por IP) o 5xx: esperar `retryAfterMs` antes de reintentar
+ *  cut       se cortó la conexión o dejaron de llegar latidos: se puede reconectar enseguida
+ */
+export type StreamEnd = 'missing' | 'gone' | 'rejected' | 'cut';
+
+export interface MeetingStreamHandlers {
+  onOpen: () => void;
+  /** Eventos `progress` y `heartbeat`: los dos traen la foto completa */
+  onProgress: (progress: MeetingProgressDto) => void;
+  /** Foto final (Completed o Failed). El flujo ya está cerrado. */
+  onTerminal: (progress: MeetingProgressDto) => void;
+  onEnd: (reason: StreamEnd, retryAfterMs: number) => void;
+}
+
+/** Sin el endpoint, se recuerda unos minutos para no insistir: las rutas inexistentes cuentan para el bloqueo por IP */
+let streamMissingUntil = 0;
+const STREAM_RECHECK_MS = 5 * 60_000;
+/** El servidor manda un latido cada 2 s: tanto tiempo sin nada es una conexión muerta */
+const STREAM_SILENCE_MS = 10_000;
+
+export const streamAvailable = () => Date.now() >= streamMissingUntil && !currentPause();
+
+/**
+ * GET /api/meetings/{id}/events con fetch (no EventSource): así se leen el código de estado, `code` y `Retry-After` de
+ * los rechazos, y se cancela con AbortController. La clave la añade el proxy. Los bytes pueden partir un evento entre
+ * dos bloques: se decodifica UTF-8 en streaming y se separan los eventos por línea vacía.
+ */
+export function streamMeeting(id: string, handlers: MeetingStreamHandlers): { close: () => void } {
+  const controller = new AbortController();
+  let finished = false;
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+
+  const finish = (reason: StreamEnd | null, retryAfterMs = 0) => {
+    if (finished) return;
+    finished = true;
+    clearTimeout(watchdog);
+    controller.abort();
+    if (reason) handlers.onEnd(reason, retryAfterMs);
+  };
+  const alive = () => {
+    clearTimeout(watchdog);
+    watchdog = setTimeout(() => finish('cut'), STREAM_SILENCE_MS);
+  };
+
+  const frame = (raw: string) => {
+    let event = 'message';
+    const data: string[] = [];
+    for (const line of raw.split('\n')) {
+      if (line.startsWith(':')) continue; // comentario
+      const colon = line.indexOf(':');
+      const field = colon < 0 ? line : line.slice(0, colon);
+      const value = colon < 0 ? '' : line.slice(colon + 1).replace(/^ /, '');
+      if (field === 'event') event = value;
+      else if (field === 'data') data.push(value);
+    }
+    if ((event !== 'progress' && event !== 'heartbeat') || data.length === 0) return;
+    let progress: MeetingProgressDto;
+    try {
+      progress = JSON.parse(data.join('\n')) as MeetingProgressDto;
+    } catch {
+      return;
+    }
+    if (progress.isTerminal) {
+      handlers.onTerminal(progress);
+      finish(null);
+    } else {
+      handlers.onProgress(progress);
+    }
+  };
+
+  void (async () => {
+    const pause = currentPause();
+    if (pause) return finish('rejected', pause.until - Date.now());
+    if (Date.now() < streamMissingUntil) return finish('missing');
+
+    let response: Response;
+    try {
+      response = await fetch(`/api/meetings/${id}/events`, { headers: { Accept: 'text/event-stream' }, cache: 'no-store', signal: controller.signal });
+    } catch {
+      return finish('cut');
+    }
+    if (finished) return;
+    const isStream = response.ok && (response.headers.get('Content-Type') ?? '').startsWith('text/event-stream');
+    if (!isStream || !response.body) {
+      const error = toApiError(response.status, (name) => response.headers.get(name), await response.text().catch(() => ''));
+      if (response.status === 404 && error.code === 'MeetingNotFound') return finish('gone');
+      if (response.status === 404 || response.status === 405 || response.ok) {
+        streamMissingUntil = Date.now() + STREAM_RECHECK_MS;
+        return finish('missing');
+      }
+      return finish('rejected', (error.retryAfter ?? 30) * 1000);
+    }
+
+    handlers.onOpen();
+    alive();
+    const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buffer = '';
+    try {
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done || finished) break;
+        alive();
+        buffer = (buffer + value).replace(/\r\n?/g, '\n');
+        for (let cut = buffer.indexOf('\n\n'); cut >= 0 && !finished; cut = buffer.indexOf('\n\n')) {
+          frame(buffer.slice(0, cut));
+          buffer = buffer.slice(cut + 2);
+        }
+      }
+    } catch {
+      /* conexión cortada o cancelada */
+    }
+    // Terminó sin estado final: el servidor se reinició, un proxy cortó… El trabajo sigue; se puede reconectar.
+    finish('cut');
+  })();
+
+  return { close: () => finish(null) };
 }
 
 /**

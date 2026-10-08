@@ -4,7 +4,11 @@ dist/
 *.tsbuildinfo
 *.local
 .vite/
+
+# Variables de entorno: se suben solo las de desarrollo (sin secretos) y la plantilla de producción
 .env
 .env.*
-!.env.example
+!.env.development
+!.env.production.example
+
 .claude/settings.local.json
