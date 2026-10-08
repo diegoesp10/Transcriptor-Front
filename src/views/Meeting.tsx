@@ -377,7 +377,7 @@ function StatePanel({ item }: { item: LibraryItem }) {
         <p className="lede">{t('meeting.localText')}</p>
         <EngineNotice />
         <div className="state-actions">
-          <LanguageSelect value={item.language} onChange={(language) => library.setLanguage(item.id, language)} label={t('review.language')} />
+          <LanguageSelect value={item.language} onChange={(language) => library.setLanguage(item.id, language)} label={t('review.language')} align="start" />
           <button className="btn btn-primary btn-lg" onClick={() => library.transcribe(item.id)} disabled={!item.hasMedia}>
             <Sparkles size={18} />
             {t('card.transcribe')}

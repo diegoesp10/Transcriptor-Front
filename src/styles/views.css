@@ -176,15 +176,6 @@
 }
 
 @media (max-width: 640px) {
-  .recorder-top {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .recorder-top .select {
-    justify-content: flex-start;
-  }
-
   .recorder-controls {
     gap: 12px;
   }

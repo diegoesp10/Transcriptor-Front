@@ -84,7 +84,9 @@
       "noDevice": "No se encuentra ningún micrófono. Conecta uno y vuelve a intentarlo.",
       "busy": "El micrófono está siendo usado por otra aplicación.",
       "failed": "No se pudo grabar. Inténtalo de nuevo."
-    }
+    },
+    "languageHint": "Se envía al servidor con la grabación",
+    "languageMenu": "Idioma del audio"
   },
   "review": {
     "eyebrow": "Grabación terminada",

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, ArrowRight, Download, Hourglass, Info, Pause, Play, Trash2, WifiOff } from 'lucide-react';
+import { AlertCircle, ArrowRight, Download, Hourglass, Info, Languages, Pause, Play, Trash2, WifiOff } from 'lucide-react';
 import { ConfirmButton } from '../components/ConfirmButton';
 import { Dropzone } from '../components/Dropzone';
 import { EngineNotice } from '../components/EngineNotice';
@@ -126,11 +126,20 @@ function Recorder() {
 
   return (
     <div className="recorder">
-      <div className="recorder-top">
-        <LanguageSelect value={prefs.language} onChange={(language) => update({ language })} label={t('recorder.language')} disabled={live} />
+      {/* Lo que se configura antes de grabar: una tarjeta agrupada, una fila por ajuste, todas con el mismo selector */}
+      <div className="group-card recorder-setup">
+        <div className="list-row">
+          <span className="row-icon tint-indigo">
+            <Languages size={18} />
+          </span>
+          <span className="row-text">
+            <b>{t('recorder.language')}</b>
+            <small>{t('recorder.languageHint')}</small>
+          </span>
+          <LanguageSelect value={prefs.language} onChange={(language) => update({ language })} label={t('recorder.language')} disabled={live || waiting} />
+        </div>
+        <MicPicker embedded disabled={live || waiting} />
       </div>
-
-      <MicPicker disabled={live || waiting} />
 
       <div className="recorder-stage" role="timer" aria-label={t('recorder.recordingLabel')}>
         <div className={`recorder-state ${live && !paused ? 'is-rec' : ''}`}>
@@ -243,7 +252,7 @@ function Review({ navigate }: { navigate: (route: Route) => void }) {
         </label>
         <div className="field">
           <span>{t('review.language')}</span>
-          <LanguageSelect value={language} onChange={setLanguage} label={t('review.language')} />
+          <LanguageSelect value={language} onChange={setLanguage} label={t('review.language')} align="start" />
         </div>
       </div>
 

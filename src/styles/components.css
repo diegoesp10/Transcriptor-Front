@@ -229,45 +229,6 @@ input:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent);
 }
 
-.select {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 22px;
-  background: var(--fill);
-  color: var(--label-2);
-}
-
-.select select {
-  appearance: none;
-  height: 100%;
-  padding: 0 22px 0 0;
-  border: 0;
-  background: transparent;
-  color: var(--label);
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-}
-
-.select select option {
-  color: #000;
-  background: #fff;
-}
-
-.select:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent);
-}
-
-.select > svg:last-child {
-  position: absolute;
-  right: 14px;
-  pointer-events: none;
-}
-
 /* Campo de búsqueda */
 .search {
   display: flex;
@@ -577,6 +538,10 @@ input:focus-visible {
   border-radius: 16px;
 }
 
+.popover.glass {
+  background: var(--glass-menu);
+}
+
 .menu-panel {
   position: absolute;
   top: calc(100% + 8px);
@@ -683,84 +648,51 @@ input:focus-visible {
   font-size: 12.5px;
 }
 
-.row-select {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  max-width: 55%;
-  color: var(--label-2);
-}
-
-.row-select select {
-  appearance: none;
-  max-width: 100%;
-  height: 36px;
-  padding: 0 22px 0 8px;
-  border: 0;
-  background: transparent;
-  color: var(--label-2);
-  font-size: 15px;
-  text-align: right;
-  text-overflow: ellipsis;
-  outline: none;
-  cursor: pointer;
-}
-
-.row-select select option {
-  color: #000;
-  background: #fff;
-}
-
-.row-select > svg {
-  position: absolute;
-  right: 4px;
-  pointer-events: none;
-}
-
-.mic-picker {
+/* Tarjeta agrupada de ajustes: filas separadas por una línea fina, como las listas de los ajustes del sistema */
+.group-card {
   container-type: inline-size;
   border-radius: 14px;
   background: var(--surface-2);
 }
 
-.mic-picker .list-row {
+.group-card > * + * {
+  border-top: 0.5px solid var(--separator);
+}
+
+.group-card .list-row {
   position: relative;
   flex-wrap: wrap;
 }
 
+.group-card .note {
+  border-radius: 0;
+  background: transparent;
+}
+
 /* Sin sitio (móvil o columna estrecha): el selector baja a su propia línea a todo el ancho y el menú ocupa la tarjeta */
 @container (max-width: 440px) {
-  .mic-picker .mic-select {
+  .group-card .list-row .picker {
     position: static;
     flex-basis: 100%;
     max-width: 100%;
   }
 
-  .mic-picker .mic-select .picker-btn {
+  .group-card .list-row .picker-btn {
     width: 100%;
     height: 40px;
     border-radius: 12px;
   }
 
-  .mic-picker .mic-select .picker-value {
+  .group-card .list-row .picker-value {
     flex: 1;
     text-align: left;
   }
 
-  .mic-picker .mic-select .mic-menu {
+  .group-card .list-row .picker-menu {
     right: 8px;
     left: 8px;
     width: auto;
   }
-}
-
-.mic-picker > * + * {
-  border-top: 0.5px solid var(--separator);
-}
-
-.mic-picker .note {
-  border-radius: 0;
-  background: transparent;
 }
 
 /* Botón de valor de un menú emergente: cápsula gris con el valor y las flechas arriba/abajo de los menús del sistema */
@@ -809,21 +741,55 @@ input:focus-visible {
   white-space: nowrap;
 }
 
-.mic-select {
+.picker {
   min-width: 0;
   max-width: 58%;
 }
 
-.mic-menu {
+/* Fuera de una fila (formularios, acciones) el selector no comparte espacio: puede usar todo el ancho */
+:not(.list-row) > .picker {
+  max-width: 100%;
+}
+
+.picker-menu {
   width: min(340px, calc(100vw - 32px));
   max-height: min(420px, 60vh);
   overflow-y: auto;
 }
 
-/* En el menú se lee el nombre entero del dispositivo, aunque ocupe dos líneas */
-.mic-menu .menu-item b {
+/* Con el botón a la izquierda, el menú se abre hacia la derecha para no salirse de la pantalla */
+.picker-menu.is-start {
+  right: auto;
+  left: 0;
+  transform-origin: top left;
+}
+
+/* En el menú se lee el nombre entero, aunque ocupe dos líneas */
+.picker-menu .menu-item b {
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+/* Código corto (ES, EN…) en el sitio del icono, para opciones que no tienen uno propio. El selector incluye
+   .menu-item para ganar a la regla de la columna de texto (.menu-item > span), que lo estiraría. */
+.menu-item > .menu-code {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 20px;
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.menu-item:hover .menu-code,
+.menu-item:focus-visible .menu-code {
+  background: rgb(255 255 255 / 0.22);
+  color: #fff;
 }
 
 /* Opción elegida: marca a la derecha (en los menús del sistema la marca va a la izquierda; aquí el icono ocupa ese sitio) */
@@ -917,14 +883,6 @@ input:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 18px;
-}
-
-.recorder-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
 
 .recorder-stage {

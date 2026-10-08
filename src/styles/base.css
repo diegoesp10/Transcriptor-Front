@@ -119,6 +119,9 @@ code {
 .tint-purple {
   --tint: var(--purple);
 }
+.tint-indigo {
+  --tint: var(--indigo);
+}
 .tint-gray {
   --tint: light-dark(#8e8e93, #98989d);
 }

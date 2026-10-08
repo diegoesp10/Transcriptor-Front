@@ -52,6 +52,8 @@
 
   /* Vidrio (solo navegación, menús y reproductor flotante) */
   --glass: light-dark(rgb(255 255 255 / 0.62), rgb(44 44 48 / 0.6));
+  /* Menús emergentes: se abren sobre contenido denso (filas, texto), así que casi opacos para que se lean siempre */
+  --glass-menu: light-dark(rgb(250 250 252 / 0.92), rgb(40 40 44 / 0.94));
   --glass-edge: light-dark(rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.14));
   --glass-shadow: 0 10px 40px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.55));
 

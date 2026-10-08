@@ -84,7 +84,9 @@
       "noDevice": "No microphone found. Plug one in and try again.",
       "busy": "The microphone is being used by another application.",
       "failed": "Recording failed. Please try again."
-    }
+    },
+    "languageHint": "Sent to the server with the recording",
+    "languageMenu": "Audio language"
   },
   "review": {
     "eyebrow": "Recording finished",
