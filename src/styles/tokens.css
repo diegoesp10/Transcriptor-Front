@@ -1,0 +1,77 @@
+/*
+ * Sistema de diseño de Murmur.
+ * Sigue las pautas públicas de interfaz de Apple (Human Interface Guidelines): superficies agrupadas sobre un fondo neutro,
+ * colores del sistema, tipografía del sistema, esquinas generosas y concéntricas, y vidrio translúcido SOLO en la capa de
+ * navegación (barra lateral, pestañas, menús, reproductor flotante). El contenido va siempre en superficies sólidas.
+ * Cada color de modo se define una vez con light-dark(día, noche); lo decide color-scheme (sistema, o data-theme).
+ *
+ * Nota legal: se usan valores de color y medidas funcionales, no recursos de Apple (ni logotipos, ni SF Symbols, ni la
+ * tipografía San Francisco empaquetada). Ver NOTICE.md.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Fondos y superficies */
+  --bg: light-dark(#f2f2f7, #000000);
+  --surface: light-dark(#ffffff, #1c1c1e);
+  --surface-2: light-dark(#f2f2f7, #2c2c2e);
+
+  /* Texto (primario, secundario, terciario) */
+  --label: light-dark(#000000, #ffffff);
+  --label-2: light-dark(rgb(60 60 67 / 0.62), rgb(235 235 245 / 0.62));
+  --label-3: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
+
+  /* Líneas y rellenos translúcidos */
+  --separator: light-dark(rgb(60 60 67 / 0.2), rgb(84 84 88 / 0.6));
+  --fill: light-dark(rgb(120 120 128 / 0.12), rgb(120 120 128 / 0.24));
+  --fill-2: light-dark(rgb(120 120 128 / 0.18), rgb(120 120 128 / 0.34));
+
+  /* Colores del sistema */
+  --blue: light-dark(#007aff, #0a84ff);
+  --green: light-dark(#34c759, #30d158);
+  --red: light-dark(#ff3b30, #ff453a);
+  --orange: light-dark(#ff9500, #ff9f0a);
+  --yellow: light-dark(#ffcc00, #ffd60a);
+  --purple: light-dark(#af52de, #bf5af2);
+  --pink: light-dark(#ff2d55, #ff375f);
+  --cyan: light-dark(#32ade6, #64d2ff);
+  --indigo: light-dark(#5856d6, #5e5ce6);
+  --teal: light-dark(#30b0c7, #40c8e0);
+  --brown: light-dark(#a2845e, #ac8e68);
+  --accent: var(--blue);
+
+  /* Una tinta por voz, en orden de aparición */
+  --spk-0: var(--blue);
+  --spk-1: var(--orange);
+  --spk-2: var(--green);
+  --spk-3: var(--purple);
+  --spk-4: var(--pink);
+  --spk-5: var(--teal);
+  --spk-6: var(--indigo);
+  --spk-7: var(--brown);
+
+  /* Vidrio (solo navegación, menús y reproductor flotante) */
+  --glass: light-dark(rgb(255 255 255 / 0.62), rgb(44 44 48 / 0.6));
+  --glass-edge: light-dark(rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.14));
+  --glass-shadow: 0 10px 40px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.55));
+
+  /* Forma */
+  --r-card: 20px;
+  --r-ctl: 12px;
+  --r-sm: 8px;
+
+  /* Tipografía: la del sistema en equipos Apple; Inter (licencia libre) en el resto */
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter Variable', 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Movimiento: curva de resorte suave, la de las hojas y menús del sistema */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+:root[data-theme='day'] {
+  color-scheme: light;
+}
+
+:root[data-theme='night'] {
+  color-scheme: dark;
+}

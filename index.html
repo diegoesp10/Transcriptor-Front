@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f2f2f7" />
+    <title>Murmur · Transcriptor de reuniones</title>
+    <script>
+      // Aplica el modo y el idioma guardados antes de pintar para evitar un destello
+      try {
+        var mode = localStorage.getItem('mm-mode');
+        if (mode === 'night' || mode === 'day') document.documentElement.dataset.theme = mode;
+        var lang = localStorage.getItem('mm-lang');
+        if (lang === 'es' || lang === 'en') document.documentElement.lang = lang;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

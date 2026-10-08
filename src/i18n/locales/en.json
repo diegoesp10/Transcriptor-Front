@@ -1,0 +1,534 @@
+{
+  "app": {
+    "name": "Murmur"
+  },
+  "common": {
+    "close": "Close",
+    "sure": "Sure?",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "toasts": {
+    "region": "Notifications"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "studio": "Studio",
+    "library": "Library",
+    "settings": "Settings",
+    "busy": {
+      "one": "{count} job in progress",
+      "other": "{count} jobs in progress"
+    },
+    "recording": "Recording"
+  },
+  "backend": {
+    "checking": {
+      "short": "Checking…",
+      "long": "Checking the connection to the server…"
+    },
+    "online": {
+      "short": "Connected",
+      "long": "The server is responding. This is a basic check: the state of the transcription engines is in Settings."
+    },
+    "offline": {
+      "short": "Offline",
+      "long": "The server can't be reached. You can keep recording and saving; send it for transcription when it's back."
+    },
+    "limited": {
+      "short": "Waiting",
+      "long": "The server asked to slow down after too many requests. The app pauses on its own and carries on as soon as it can; you don't need to do anything."
+    }
+  },
+  "theme": {
+    "cycle": "Mode: {mode}. Change",
+    "system": "Auto",
+    "day": "Light",
+    "night": "Dark",
+    "label": "Appearance",
+    "systemHint": "Auto (follows the system)",
+    "auto": "Auto"
+  },
+  "lang": {
+    "switch": "Change interface language"
+  },
+  "studio": {
+    "eyebrow": "Studio",
+    "title1": "Your voice, turned into",
+    "title2": "text.",
+    "lede": "Record a meeting right here, or upload an audio or video file. We transcribe it and leave it ready to read, analyse and download.",
+    "offline": "No connection to the server. You can record and save; transcription will be sent when it's back.",
+    "recent": "Recent",
+    "seeAll": "See all",
+    "recentEmpty": "Your latest recordings and files will show up here."
+  },
+  "recorder": {
+    "title": "Recorder",
+    "mode": "What to record",
+    "modes": {
+      "mic": "Microphone",
+      "meeting": "Online meeting"
+    },
+    "meetingUnsupported": "Your browser or device can't capture the audio of a tab or the system.",
+    "language": "Audio language",
+    "start": "Record",
+    "recordingLabel": "Recording in progress",
+    "recordingState": "Recording",
+    "pausedState": "Paused",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "discard": "Discard",
+    "discardConfirm": "Discard?",
+    "hintMic": "Press Record to start. If you close the tab by accident, the recording is recovered when you come back.",
+    "hintMeeting": "We'll ask for your microphone and for you to pick the meeting's tab or screen. Tick “Share audio” so everyone else's voice is recorded too.",
+    "defaultName": "Meeting",
+    "recoveredName": "Recovered ·",
+    "recovered": "An interrupted recording was recovered. You'll find it in the library.",
+    "errors": {
+      "unsupported": "This browser can't record audio, or the page wasn't opened over HTTPS (localhost works for local development).",
+      "denied": "Microphone permission was denied. Enable it from the padlock in the address bar and try again.",
+      "noDevice": "No microphone found. Plug one in and try again.",
+      "busy": "The microphone is being used by another application.",
+      "noSystemAudio": "No audio was shared. Pick the tab again and tick “Share audio” (in Chrome, with a tab or “Entire screen”).",
+      "failed": "Recording failed. Please try again."
+    }
+  },
+  "review": {
+    "eyebrow": "Recording finished",
+    "title": "New recording",
+    "name": "Name",
+    "language": "Audio language",
+    "transcribeNow": "Transcribe as soon as it's saved",
+    "saveAndTranscribe": "Save and transcribe",
+    "save": "Save",
+    "download": "Download audio",
+    "discard": "Discard",
+    "discardConfirm": "Discard?",
+    "heading": "Listen and save it"
+  },
+  "recbar": {
+    "recording": "Recording",
+    "paused": "Recording paused",
+    "ready": "Recording ready to save",
+    "open": "Open studio",
+    "review": "Review"
+  },
+  "dropzone": {
+    "title": "Drop your audio and video here",
+    "hint": "They're kept in this browser and sent for transcription. Up to 2 GB per file.",
+    "choose": "Choose files",
+    "formats": "Supported formats",
+    "window": "Files"
+  },
+  "upload": {
+    "reject": {
+      "extension": "unsupported format",
+      "empty": "the file is empty",
+      "tooLarge": "exceeds the maximum size"
+    },
+    "added": {
+      "one": "{count} file added to the library",
+      "other": "{count} files added to the library"
+    }
+  },
+  "status": {
+    "local": "Local only",
+    "uploading": "Uploading",
+    "uploadFailed": "Not sent",
+    "Queued": "Queued",
+    "Processing": "Transcribing",
+    "Completed": "Ready",
+    "Failed": "Failed"
+  },
+  "progress": {
+    "uploading": "Uploading… {percent}%",
+    "queued": "Queued, waiting for its turn",
+    "processing": "Transcribing · part {done} of {total}",
+    "preparing": "Preparing the audio…"
+  },
+  "card": {
+    "details": "Details",
+    "transcribe": "Transcribe",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteConfirm": "Delete?",
+    "failedNote": "Transcription failed. You can try again.",
+    "noWave": "No waveform preview",
+    "remoteNote": "Opened by identifier: the audio isn't in this browser."
+  },
+  "library": {
+    "eyebrow": "Library",
+    "title1": "Your",
+    "title2": "meetings",
+    "search": "Search by name…",
+    "filters": "Filter",
+    "filter": {
+      "all": "All",
+      "active": "In progress",
+      "done": "Ready",
+      "attention": "Needs attention",
+      "local": "Not sent"
+    },
+    "ready": "“{name}” is now transcribed.",
+    "noResults": "No meeting matches your search.",
+    "empty": {
+      "title": "It all starts with a voice",
+      "text": "There's nothing here yet. Record your first meeting or upload an audio or video file.",
+      "cta": "Go to the studio"
+    },
+    "byId": {
+      "open": "Open by identifier",
+      "label": "Meeting identifier on the server",
+      "submit": "Open",
+      "invalid": "That doesn't look like a valid identifier (GUID).",
+      "note": "The server doesn't list meetings, so the library is kept in this browser. Here you can bring in a meeting from another browser if you know its identifier. It won't have the original audio."
+    }
+  },
+  "meeting": {
+    "backToLibrary": "Library",
+    "notFound": "We can't find that meeting in this browser",
+    "rename": "Rename",
+    "deleteConfirm": "Delete?",
+    "tabs": "View",
+    "tabTranscript": "Transcript",
+    "tabAnalysis": "Analysis",
+    "transcriptError": "The transcript couldn't be loaded.",
+    "uploadingTitle": "Uploading the file",
+    "uploadingHint": "Don't close this tab until the upload finishes.",
+    "processingTitle": "Transcribing",
+    "processingHint": "The server works in chunks of about 10 minutes. You can close the tab: you'll see the result when you're back.",
+    "failedTitle": "Transcription failed",
+    "failedHint": "Retrying processes the whole audio again from the start and uses the server's machine again.",
+    "retryJob": "Retry transcription",
+    "uploadFailedTitle": "It couldn't be sent",
+    "uploadFailedText": "The file is still saved in this browser. Check your connection and try again.",
+    "localTitle": "Saved, not transcribed yet",
+    "localText": "The audio is safe in this browser. Pick the language and send it whenever you like.",
+    "retries": {
+      "one": "Already retried {count} time.",
+      "other": "Already retried {count} times."
+    }
+  },
+  "player": {
+    "label": "Player",
+    "play": "Play",
+    "pause": "Pause",
+    "back": "Back 15 seconds",
+    "forward": "Forward 15 seconds",
+    "seek": "Playback position",
+    "speed": "Playback speed"
+  },
+  "transcript": {
+    "play": "Listen from here",
+    "playAt": "Listen from {time}",
+    "chunkTiming": "With this model the timestamps are approximate: each block marks the start of a chunk of about 10 minutes, not of each sentence.",
+    "search": "Search the transcript…",
+    "noMatches": "No results",
+    "prev": "Previous result",
+    "next": "Next result",
+    "follow": "Follow the audio",
+    "empty": "The transcript contains no text.",
+    "speakers": "Voices",
+    "renameSpeaker": "Name this voice",
+    "showAll": "Show all {count} voices",
+    "showFewer": "Show fewer",
+    "speakerScope": "Voice labels (A, B…) restart in every chunk of about 10 minutes: “Voice A · part 1” and “Voice A · part 2” may be different people. Name them by hand to unify them.",
+    "count": {
+      "one": "{count} block",
+      "other": "{count} blocks"
+    }
+  },
+  "speaker": {
+    "voice": "Voice {label}",
+    "voicePart": "Voice {label} · part {part}",
+    "unknown": "Undetermined speaker",
+    "numbered": "Speaker {n}"
+  },
+  "analysis": {
+    "disclaimer": "Automatic reading done in your browser with counts and text patterns, no AI. It can be wrong or miss things: always check it against the audio, especially names, figures and dates.",
+    "disclaimerShort": "Detected by text patterns, no AI. Verify it against the audio.",
+    "duration": "Duration",
+    "words": "Words",
+    "speakers": "Voices",
+    "questions": "Questions",
+    "voiceLabels": "Voice labels",
+    "pace": "Pace",
+    "wpm": "wpm",
+    "whoSpeaks": "Who speaks",
+    "wordsCount": {
+      "one": "{n} word",
+      "other": "{n} words"
+    },
+    "turns": {
+      "one": "{count} turn",
+      "other": "{count} turns"
+    },
+    "shareByWords": "This model gives no per-sentence timing, so the split is by word count, not by speaking time.",
+    "timeline": "Timeline",
+    "keywords": "Keywords",
+    "times": {
+      "one": "{count} time",
+      "other": "{count} times"
+    },
+    "actions": "Agreements and tasks",
+    "actionsHint": "Sentences that usually introduce a commitment or something pending.",
+    "actionsEmpty": "No commitments were detected with the usual phrasing.",
+    "figures": "Figures and dates to verify",
+    "figuresHint": "Amounts, percentages and dates: the costliest things to get wrong.",
+    "figuresEmpty": "No amounts or dates were detected.",
+    "questionsTitle": "Questions",
+    "questionsEmpty": "There are no questions in the transcript.",
+    "showInTranscript": "Show in the transcript",
+    "listen": "Listen to this moment"
+  },
+  "export": {
+    "button": "Download",
+    "title": "Download transcript",
+    "txt": "Text (.txt)",
+    "txtHint": "With time and name for each voice",
+    "md": "Document (.md)",
+    "mdHint": "With keywords, findings and transcript",
+    "srt": "Subtitles (.srt)",
+    "srtHint": "For video players",
+    "vtt": "Web subtitles (.vtt)",
+    "vttHint": "For browsers and editors",
+    "json": "Data (.json)",
+    "jsonHint": "Segments with timings and voices",
+    "copy": "Copy text",
+    "copyHint": "To the clipboard",
+    "copied": "Transcript copied.",
+    "copyFailed": "Couldn't copy to the clipboard.",
+    "server": "Server original (.txt)",
+    "serverHint": "Without your voice names",
+    "media": "Original audio",
+    "mediaHint": "The file saved in this browser"
+  },
+  "md": {
+    "date": "Date",
+    "language": "Language",
+    "duration": "Duration",
+    "speakers": "Voices",
+    "words": "Words",
+    "transcript": "Transcript"
+  },
+  "settings": {
+    "eyebrow": "Settings",
+    "title1": "Preferences",
+    "title2": "and connection",
+    "appearance": "Appearance",
+    "theme": "Appearance",
+    "interfaceLanguage": "Interface language",
+    "transcription": "Transcription",
+    "audioLanguage": "Default audio language",
+    "audioLanguageHint": "Sent to the server with every file.",
+    "autoTranscribe": "Transcribe on save",
+    "autoTranscribeHint": "Automatically sends each new recording or file to the server.",
+    "connection": "Connection",
+    "checkNow": "Check now",
+    "lastCheck": "Last check: {time}",
+    "connectionHelp": "The app talks to the API through a proxy (/api) that adds the access key, so the key never reaches the browser.",
+    "storage": "Local storage",
+    "storageUsed": "{used} used of {quota} available",
+    "storageItems": {
+      "one": "{count} item in the library",
+      "other": "{count} items in the library"
+    },
+    "privacy": "The folder you choose is the final destination of every meeting. This browser also keeps a working copy so you can listen to and read them in the app, and the server keeps a temporary copy (24 h) while it processes. Clearing local data doesn't touch your folder or the server copy.",
+    "clear": "Clear all local data",
+    "clearConfirm": "Clear everything?",
+    "cleared": "Local data cleared.",
+    "folder": "Meetings folder",
+    "microphone": "Microphone"
+  },
+  "errors": {
+    "unknown": "An unexpected error occurred.",
+    "offline": "The server can't be reached. Check your connection.",
+    "badRequest": "The server rejected the request.",
+    "auth": "The server doesn't accept the access key. Check BACKEND_API_KEY in the .env file.",
+    "notFound": "The server doesn't know that meeting.",
+    "conflict": "The meeting isn't in a state that allows that action.",
+    "tooLarge": "The file exceeds the size the server accepts.",
+    "unsupported": "The server doesn't accept this kind of upload.",
+    "server": "The server had a problem. Try again in a moment.",
+    "mediaMissing": "The file is no longer stored in this browser.",
+    "storage": "Couldn't save to the browser's storage. It may be full or blocked.",
+    "job": {
+      "ProcessingFailed": "The server couldn't process the audio.",
+      "WorkerInterrupted": "The server was interrupted while working on this meeting.",
+      "unknown": "The server didn't give a reason.",
+      "other": "The server reported the code “{code}”."
+    },
+    "forbidden": "The server doesn't allow this action.",
+    "blocked": "The server has temporarily blocked this machine's requests after too many attempts.",
+    "rateLimited": "Too many requests in a row.",
+    "paused": "Paused because of the server's limits.",
+    "waitSeconds": {
+      "one": "Wait {count} second.",
+      "other": "Wait {count} seconds."
+    },
+    "waitMinutes": {
+      "one": "Wait {count} minute.",
+      "other": "Wait {count} minutes."
+    },
+    "unavailable": "The server can't handle this right now.",
+    "codes": {
+      "ProcessingFailed": "The server couldn't process the audio.",
+      "WorkerInterrupted": "The server was interrupted while working on this meeting.",
+      "WorkerPersistenceFailed": "The server couldn't save the transcription progress.",
+      "UnexpectedError": "The server hit an unexpected error.",
+      "MediaProcessingTimeout": "Preparing the audio took too long on the server.",
+      "InvalidMediaOrMissingAudio": "The file is damaged, its format isn't supported, or the video has no audio track.",
+      "NoAudio": "No speech was found in the audio to transcribe.",
+      "ChunkTooLarge": "A chunk of the audio was too large to process.",
+      "FFmpegUnavailable": "The server can't find FFmpeg, which it needs to prepare the audio.",
+      "WhisperModelMissing": "The transcription model (Whisper) is missing on the server.",
+      "WhisperRuntimeUnavailable": "The transcription engine (Whisper) can't start on the server.",
+      "WhisperInferenceFailed": "The transcription engine failed. The model may be damaged or the machine may be short of resources.",
+      "DiarizationRuntimeUnavailable": "The speaker separator isn't installed on the server.",
+      "DiarizationModelMissing": "The speaker separation model is missing on the server.",
+      "DiarizationFailed": "Speaker separation failed.",
+      "LocalInferenceTimeout": "The server machine took too long to process. Try again with less load.",
+      "LocalInferenceBusy": "The server is already generating another summary. Wait for it to finish and try again.",
+      "SummaryUnavailable": "The local summarizer (Ollama) isn't running on the server.",
+      "SummaryModelMissing": "The summary model hasn't been downloaded in Ollama.",
+      "SummaryModelNotLocal": "The configured summary model isn't local, so the server won't use it.",
+      "SummaryInvalidResponse": "The model returned an invalid summary. Try again.",
+      "SummaryInputTooLarge": "The transcript is too long to summarize.",
+      "MeetingRetryLimitExceeded": "This meeting has reached the maximum number of retries.",
+      "MeetingNotFailedOrRetryLimitExceeded": "The meeting can't be retried: it hasn't failed or there are no retries left.",
+      "TranscriptNotCompleted": "The transcript isn't complete yet.",
+      "MeetingStillActive": "The meeting is still being processed; wait for it to finish.",
+      "LocalFilesNotSaved": "The files have to be saved first.",
+      "SecurityCapacityReached": "The server is overloaded right now. Try again in a few minutes.",
+      "ProviderQuotaExceeded": "Failed due to the old external provider quota. It is no longer used: retry with the local engines.",
+      "ProviderSpendLimitExceeded": "Failed due to the old external provider spend limit. It is no longer used: retry with the local engines.",
+      "ProviderRateLimited": "The old external provider rate-limited the requests. It is no longer used: retry with the local engines.",
+      "MissingProviderKey": "The old external provider key was missing. It is no longer used: retry with the local engines."
+    }
+  },
+  "deck": {
+    "model": "Voice recorder",
+    "ready": "Ready",
+    "waiting": "Waiting for permission",
+    "level": "Input level",
+    "idleHint": "Ready to record"
+  },
+  "local": {
+    "window": "Destination",
+    "askTitle": "Where do you want to keep your meetings?",
+    "askText": "Pick a folder on your computer: the recording, transcript and summary of every meeting will end up there. The server only keeps a temporary copy while it processes, and your folder's path never leaves the browser.",
+    "choose": "Choose folder",
+    "change": "Change folder",
+    "renew": "Renew permission",
+    "forget": "Forget folder",
+    "current": "Saving to",
+    "needsPermission": "The browser needs you to authorise writing to “{name}” again.",
+    "denied": "Access to “{name}” was denied. Pick the folder again.",
+    "unsupported": "This browser can't pick a folder (Chrome or Edge over HTTPS or localhost is required). You'll be able to download each meeting's files instead.",
+    "autoSave": "Save when done",
+    "autoSaveHint": "As soon as transcription ends, the files are written to the folder. Deleting the server copy is always a manual step.",
+    "autoSaved": "“{name}” saved to the folder “{folder}”.",
+    "panelTitle": "Local copy",
+    "expires": "The server's temporary copy expires {when}.",
+    "expired": "The server's temporary copy has expired: the server may have deleted it already.",
+    "serverDeleted": "The server copy has been deleted. What remains is in your folder.",
+    "step1": "Save to your folder",
+    "step1Hint": "Original, transcript (JSON and TXT) and, if you already generated it, the summary.",
+    "step1Done": "Saved in “{root}/{folder}”",
+    "step1DoneDownloads": "Downloaded: {count} files",
+    "save": "Save to the folder",
+    "saveAgain": "Save again",
+    "saving": "Saving {done} of {total}…",
+    "savingStart": "Preparing…",
+    "download": "Download the files",
+    "noFolderYet": "Pick a destination folder first.",
+    "step2": "Summary (optional)",
+    "step2Hint": "Generate it in the Analysis tab before saving and it will be included in the folder.",
+    "summaryIn": "Included in the folder",
+    "summaryOut": "Not included",
+    "step3": "Delete the server copy",
+    "step3Hint": "Permanently deletes the original and the transcript from the server. Your files are untouched. It doesn't remove the server's backups.",
+    "delete": "Delete server copy",
+    "deleteConfirm": "Delete for good?",
+    "deleteLocked": "Unlocks once the files are saved.",
+    "deleted": "Server copy deleted.",
+    "savedFiles": "Files: {files}",
+    "folderBadge": "In your folder",
+    "downloadBadge": "Downloaded",
+    "errors": {
+      "unsupported": "This browser can't write to a folder.",
+      "permission": "Permission to write to the folder is missing. Renew it and save again.",
+      "inactive": "The meeting isn't ready to be saved (or its transcript isn't in this browser).",
+      "disk": "There is not enough disk space.",
+      "verify": "A file wasn't written completely. The server copy is intact: try again.",
+      "expired": "The server no longer has the files (the temporary copy expired or was deleted).",
+      "artifact": "The server refused a file download (HTTP {status}).",
+      "write": "Couldn't write to the folder.",
+      "deleteFailed": "Couldn't delete the server copy."
+    }
+  },
+  "summary": {
+    "title": "Summary",
+    "generate": "Generate summary",
+    "regenerate": "Generate again",
+    "generating": "Generating the summary…",
+    "cost": "Generated by the server with a local model, no external services. It takes a few minutes and runs one at a time. It is kept in this browser and included when saving to the folder.",
+    "draftNotice": "Automatically generated draft. Requires human review.",
+    "draftShort": "Draft · human review",
+    "overview": "Overview",
+    "highlights": "Highlights",
+    "decisions": "Decisions",
+    "actionItems": "Tasks",
+    "openQuestions": "Open questions",
+    "segments": "segments",
+    "none": "None",
+    "generatedAt": "Generated {when}",
+    "evidence": "See segment {n} in the transcript",
+    "unavailable": "The server copy was deleted: a new summary can no longer be generated.",
+    "evidenceNote": "The numbers link to the sentence in the transcript that supports each point. A valid reference does not certify that the content is true.",
+    "errors": {
+      "notReady": "The transcript isn't complete yet.",
+      "tooLong": "The transcript exceeds the 500,000-character limit for summaries.",
+      "invalid": "The model returned an invalid summary. Try again.",
+      "unavailable": "The server's local summarizer isn't available right now.",
+      "timeout": "The local model took too long. Try again with less load on the server."
+    }
+  },
+  "mic": {
+    "label": "Microphone",
+    "count": {
+      "one": "{count} available",
+      "other": "{count} available"
+    },
+    "default": "System default",
+    "defaultNamed": "Default · {name}",
+    "unnamed": "Microphone {n}",
+    "missing": "Microphone unavailable",
+    "missingNote": "The microphone you chose is no longer connected. The system default will be used when recording.",
+    "grant": "Allow access",
+    "grantHint": "The browser only shows microphone names once you give it permission. This step doesn't record anything.",
+    "denied": "Microphone access is blocked. Enable it from the padlock in the address bar and reload the page.",
+    "test": "Test",
+    "testStop": "Stop test",
+    "testStarting": "Opening the microphone…",
+    "testing": "Speak to see the level",
+    "testError": "That microphone couldn't be opened.",
+    "level": "Input level",
+    "unsupported": "This browser can't choose the microphone.",
+    "fallback": "The chosen microphone wasn't available: the system default was used for this recording."
+  },
+  "engine": {
+    "title": "Server engines",
+    "transcription": "Transcription",
+    "speakers": "Speakers",
+    "summary": "Summary",
+    "ready": "Ready",
+    "missing": "Unavailable",
+    "disabled": "disabled",
+    "notReady": "The server can't transcribe right now.",
+    "unknown": "Couldn't check the engines' state.",
+    "help": "Everything runs on the server with local models: Whisper to transcribe, Community-1 to separate speakers and Ollama to summarize. Being ready doesn't guarantee every transcription will come out right."
+  }
+}

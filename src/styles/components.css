@@ -1,0 +1,1214 @@
+/* Componentes reutilizables. Medidas pensadas para el dedo y el puntero: los controles principales miden 44 px de alto. */
+
+/* ── Sección agrupada: rótulo pequeño y tarjeta sólida ─────────────────────── */
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px 8px;
+}
+
+.panel-head h2 {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--label-2);
+}
+
+.panel-head span {
+  font-size: 13px;
+  color: var(--label-2);
+}
+
+.panel-body {
+  padding: 20px;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.04));
+}
+
+.panel-body.is-flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.card {
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.04));
+}
+
+/* ── Botones ───────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 22px;
+  background: var(--fill);
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    transform 0.2s var(--ease),
+    opacity 0.2s,
+    background 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--fill-2);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+  opacity: 0.8;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+}
+
+.btn-sm {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 17px;
+  font-size: 13.5px;
+}
+
+.btn-lg {
+  height: 52px;
+  padding: 0 28px;
+  border-radius: 26px;
+  font-size: 17px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 88%, #000);
+}
+
+.btn-tinted {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.btn-tinted:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+.btn-gray {
+  background: var(--fill);
+  color: var(--label);
+}
+
+.btn-plain {
+  background: transparent;
+  color: var(--accent);
+}
+
+.btn-plain:hover:not(:disabled) {
+  background: var(--fill);
+}
+
+.btn-danger-text {
+  color: var(--red);
+}
+
+/* Acción destructiva armada (ConfirmButton): se vuelve roja para pedir el segundo toque */
+.is-armed {
+  background: var(--red) !important;
+  color: #fff !important;
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  color: var(--label-2);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: var(--fill);
+  color: var(--label);
+}
+
+.icon-btn-sm {
+  min-width: 30px;
+  height: 30px;
+}
+
+.icon-btn-danger:hover:not(:disabled) {
+  color: var(--red);
+}
+
+.icon-btn.is-armed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chip-btn {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 13px;
+  background: var(--fill);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.chip-btn:hover {
+  background: var(--fill-2);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 14px -4px;
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.back:hover {
+  opacity: 0.7;
+}
+
+/* ── Formularios ───────────────────────────────────────────────────────────── */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > span {
+  padding-left: 4px;
+  font-size: 13px;
+  color: var(--label-2);
+}
+
+input[type='text'],
+input:not([type]),
+input[type='search'] {
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--r-ctl);
+  background: var(--fill);
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+
+input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 22px;
+  background: var(--fill);
+  color: var(--label-2);
+}
+
+.select select {
+  appearance: none;
+  height: 100%;
+  padding: 0 22px 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--label);
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+}
+
+.select select option {
+  color: #000;
+  background: #fff;
+}
+
+.select:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.select > svg:last-child {
+  position: absolute;
+  right: 14px;
+  pointer-events: none;
+}
+
+/* Campo de búsqueda */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--fill);
+  color: var(--label-2);
+}
+
+.search input {
+  flex: 1;
+  height: 100%;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--label);
+}
+
+.search:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.search-count {
+  font-size: 12.5px;
+}
+
+/* Interruptor */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.switch i {
+  position: relative;
+  flex: none;
+  width: 51px;
+  height: 31px;
+  border-radius: 16px;
+  background: light-dark(rgb(120 120 128 / 0.16), rgb(120 120 128 / 0.36));
+  transition: background 0.3s var(--ease);
+}
+
+.switch i::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 3px 8px rgb(0 0 0 / 0.15),
+    0 1px 1px rgb(0 0 0 / 0.16);
+  transition: transform 0.3s var(--ease);
+}
+
+.switch input:checked + i {
+  background: var(--green);
+}
+
+.switch input:checked + i::after {
+  transform: translateX(20px);
+}
+
+.switch input:focus-visible + i {
+  outline: 3px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.switch-sm i {
+  width: 40px;
+  height: 24px;
+}
+
+.switch-sm i::after {
+  width: 20px;
+  height: 20px;
+}
+
+.switch-sm input:checked + i::after {
+  transform: translateX(16px);
+}
+
+.switch-sm {
+  font-size: 13.5px;
+  color: var(--label-2);
+}
+
+/* Control segmentado: pista gris y una pastilla blanca que se desliza */
+.segmented {
+  --pad: 2px;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  padding: var(--pad);
+  border-radius: 12px;
+  background: var(--fill);
+}
+
+.segmented button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 10px;
+  color: var(--label);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.segmented button.is-on {
+  font-weight: 600;
+}
+
+.segmented button:disabled:not(.is-on) {
+  opacity: 0.4;
+}
+
+.segmented-thumb {
+  position: absolute;
+  z-index: 0;
+  top: var(--pad);
+  bottom: var(--pad);
+  left: var(--pad);
+  width: calc((100% - var(--pad) * 2) / var(--n));
+  border-radius: 10px;
+  background: light-dark(#fff, #636366);
+  box-shadow:
+    0 3px 8px rgb(0 0 0 / 0.12),
+    0 1px 1px rgb(0 0 0 / 0.08);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 0.4s var(--ease);
+}
+
+/* ── Etiquetas, avisos y notas ─────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  height: 24px;
+  padding: 0 10px 0 8px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--tint, var(--label-3)) 16%, transparent);
+  color: color-mix(in oklab, var(--tint, var(--label-2)) 82%, var(--label));
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  font-size: 14px;
+  box-shadow: 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.04));
+}
+
+.banner > svg {
+  flex: none;
+}
+
+.banner-warn {
+  background: color-mix(in oklab, var(--orange) 14%, var(--surface));
+}
+
+.banner-warn > svg {
+  color: var(--orange);
+}
+
+.banner-danger {
+  background: color-mix(in oklab, var(--red) 12%, var(--surface));
+}
+
+.banner-danger > svg {
+  color: var(--red);
+}
+
+.banner-info {
+  background: color-mix(in oklab, var(--blue) 11%, var(--surface));
+}
+
+.banner-info > svg {
+  color: var(--blue);
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--fill);
+  color: var(--label-2);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.note > svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--blue);
+}
+
+.note-warn > svg {
+  color: var(--orange);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  color: var(--label-2);
+  font-size: 13px;
+}
+
+/* ── Avisos emergentes: banners de vidrio ──────────────────────────────────── */
+
+.toasts {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(400px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px 12px 16px;
+  border-radius: 20px;
+  font-size: 14.5px;
+  pointer-events: auto;
+  animation: pop-in 0.4s var(--ease) both;
+}
+
+.toast > span {
+  flex: 1;
+}
+
+.toast-success > svg {
+  color: var(--green);
+}
+
+.toast-error > svg {
+  color: var(--red);
+}
+
+.toast-info > svg {
+  color: var(--blue);
+}
+
+@media (max-width: 760px) {
+  .toasts {
+    top: max(12px, env(safe-area-inset-top));
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}
+
+/* ── Menús emergentes: vidrio, filas de 36 px y selección en azul, como los menús del sistema ─────────────── */
+
+.menu {
+  position: relative;
+}
+
+.menu .flip {
+  transform: rotate(180deg);
+}
+
+.popover {
+  border-radius: 16px;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  width: min(350px, calc(100vw - 32px));
+  padding: 6px;
+  animation: pop-in 0.3s var(--ease) both;
+  transform-origin: top right;
+}
+
+.menu-title {
+  padding: 8px 10px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--label-2);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: var(--accent);
+  color: #fff;
+  outline: none;
+}
+
+.menu-item > svg {
+  flex: none;
+  color: var(--accent);
+}
+
+.menu-item:hover > svg,
+.menu-item:focus-visible > svg {
+  color: #fff;
+}
+
+.menu-item b {
+  display: block;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.menu-item small {
+  display: block;
+  color: var(--label-2);
+  font-size: 12.5px;
+}
+
+.menu-item:hover small,
+.menu-item:focus-visible small {
+  color: rgb(255 255 255 / 0.8);
+}
+
+.menu hr {
+  margin: 6px 10px;
+  border: 0;
+  border-top: 0.5px solid var(--separator);
+}
+
+/* ── Filas de lista (como las de los ajustes del sistema) ──────────────────── */
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 14px;
+}
+
+.row-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--tint, var(--blue));
+  color: #fff;
+}
+
+.row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.row-text b {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.row-text small {
+  color: var(--label-2);
+  font-size: 12.5px;
+}
+
+.row-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 55%;
+  color: var(--label-2);
+}
+
+.row-select select {
+  appearance: none;
+  max-width: 100%;
+  height: 36px;
+  padding: 0 22px 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--label-2);
+  font-size: 15px;
+  text-align: right;
+  text-overflow: ellipsis;
+  outline: none;
+  cursor: pointer;
+}
+
+.row-select select option {
+  color: #000;
+  background: #fff;
+}
+
+.row-select > svg {
+  position: absolute;
+  right: 4px;
+  pointer-events: none;
+}
+
+.mic-picker {
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.mic-picker > * + * {
+  border-top: 0.5px solid var(--separator);
+}
+
+.mic-picker .note {
+  border-radius: 0;
+  background: transparent;
+}
+
+.mic-test {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+}
+
+.mic-test-state {
+  min-width: 0;
+  color: var(--label-2);
+  font-size: 12.5px;
+}
+
+/* Medidor de nivel: una cápsula que se llena con la voz */
+.level {
+  position: relative;
+  flex: 0 1 160px;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--fill-2);
+}
+
+.level-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: background 0.2s;
+}
+
+.level-fill[data-hot='true'] {
+  background: var(--red);
+}
+
+/* ── Grabadora ─────────────────────────────────────────────────────────────── */
+
+.recorder {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.recorder-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recorder-stage {
+  padding: 8px 0 0;
+  text-align: center;
+}
+
+.recorder-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--label-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.recorder-state i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--label-3);
+}
+
+.recorder-state.is-rec {
+  color: var(--red);
+}
+
+.recorder-state.is-rec i {
+  background: var(--red);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.recorder-time {
+  font-size: clamp(56px, 9vw, 84px);
+  font-weight: 200;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.recorder-time.is-idle {
+  color: var(--label-3);
+}
+
+.recorder-wave {
+  height: 84px;
+  margin-top: 6px;
+}
+
+.live-wave {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.recorder-controls {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 28px;
+  padding-top: 4px;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 84px;
+  color: var(--label-2);
+  font-size: 12.5px;
+}
+
+.control .round {
+  margin-top: 10px;
+}
+
+.control:nth-child(2) .round {
+  margin-top: 0;
+}
+
+.round {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  transition:
+    transform 0.2s var(--ease),
+    opacity 0.2s,
+    background 0.2s;
+}
+
+.round:active:not(:disabled) {
+  transform: scale(0.93);
+}
+
+.round-gray {
+  background: var(--fill-2);
+  color: var(--label);
+}
+
+.round-gray:disabled {
+  opacity: 0.35;
+}
+
+.round.is-armed {
+  width: auto;
+  padding: 0 16px;
+  border-radius: 28px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Botón de grabar: anillo y círculo rojo; mientras graba, el círculo se convierte en un cuadrado redondeado (parar) */
+.round-rec {
+  width: 76px;
+  height: 76px;
+  border: 3px solid var(--label-3);
+  background: transparent;
+}
+
+.round-rec:disabled {
+  opacity: 0.5;
+}
+
+.rec-glyph {
+  display: block;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--red);
+  transition:
+    width 0.35s var(--ease),
+    height 0.35s var(--ease),
+    border-radius 0.35s var(--ease);
+}
+
+.round-rec.is-live .rec-glyph {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.recorder-hint {
+  max-width: 52ch;
+  margin: 0 auto;
+  color: var(--label-2);
+  font-size: 13px;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.recorder .banner {
+  margin: 0;
+}
+
+/* ── Onda de audio ─────────────────────────────────────────────────────────── */
+
+.wave {
+  position: relative;
+  height: 44px;
+  min-width: 0;
+  touch-action: none;
+}
+
+.wave.is-seekable {
+  cursor: pointer;
+}
+
+.wave-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5px;
+  overflow: hidden;
+}
+
+.wave-bars i {
+  flex: 1;
+  min-width: 0;
+  border-radius: 2px;
+  background: var(--label-3);
+}
+
+.wave-bars-played i {
+  background: var(--accent);
+}
+
+.wave-bars-played {
+  transition: clip-path 0.1s linear;
+}
+
+.wave-plain {
+  height: 6px;
+  align-self: center;
+  border-radius: 3px;
+  background: var(--fill-2);
+}
+
+.wave-plain .wave-bars {
+  display: none;
+}
+
+.wave-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+.wave:focus-visible {
+  outline-offset: 4px;
+}
+
+/* ── Reproductor: flotante, de vidrio ──────────────────────────────────────── */
+
+.dock .player .panel-body {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  backdrop-filter: blur(30px) saturate(190%);
+  border: 0.5px solid var(--glass-edge);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 var(--glass-edge);
+}
+
+.review .player .panel-body {
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.player .panel-body {
+  border-radius: 22px;
+}
+
+.player-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.player-video {
+  width: 100%;
+  max-height: 260px;
+  border-radius: 12px;
+  background: #000;
+  object-fit: contain;
+}
+
+.player-video.is-hidden {
+  display: none;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.play-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  transition: transform 0.2s var(--ease);
+}
+
+.play-btn:active {
+  transform: scale(0.92);
+}
+
+.player-time {
+  flex: none;
+  min-width: 42px;
+  font-size: 13px;
+}
+
+.player-total {
+  color: var(--label-2);
+}
+
+.player-wave {
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .player-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .player-wave {
+    order: 5;
+    flex-basis: 100%;
+  }
+
+  .player-total {
+    margin-right: auto;
+  }
+}
+
+/* ── Progreso ──────────────────────────────────────────────────────────────── */
+
+.progress {
+  position: relative;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--fill-2);
+}
+
+.progress i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: block;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.5s var(--ease);
+}
+
+.progress.is-indeterminate i {
+  width: 36%;
+  animation: slide 1.5s var(--ease) infinite;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(280%);
+  }
+}
+
+.ring {
+  position: relative;
+  flex: none;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring circle {
+  fill: none;
+  stroke-width: 7;
+}
+
+.ring-track {
+  stroke: var(--fill-2);
+}
+
+.ring-arc {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transform-origin: 64px 64px;
+  transition: stroke-dasharray 0.6s var(--ease);
+}
+
+.ring-arc.is-indeterminate {
+  animation: spin 1.4s linear infinite;
+}
+
+.ring-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.ring-percent {
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Estado vacío ──────────────────────────────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 20px 32px;
+  text-align: center;
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--tint) 14%, transparent);
+  color: var(--tint);
+}
+
+.empty-state h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.empty-state p {
+  max-width: 44ch;
+  margin-bottom: 8px;
+  color: var(--label-2);
+}
+
+.segmented button svg {
+  flex: none;
+}

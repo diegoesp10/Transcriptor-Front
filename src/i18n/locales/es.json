@@ -1,0 +1,534 @@
+{
+  "app": {
+    "name": "Murmur"
+  },
+  "common": {
+    "close": "Cerrar",
+    "sure": "¿Seguro?",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "toasts": {
+    "region": "Avisos"
+  },
+  "nav": {
+    "label": "Navegación principal",
+    "studio": "Estudio",
+    "library": "Biblioteca",
+    "settings": "Ajustes",
+    "busy": {
+      "one": "{count} trabajo en curso",
+      "other": "{count} trabajos en curso"
+    },
+    "recording": "Grabando"
+  },
+  "backend": {
+    "checking": {
+      "short": "Comprobando…",
+      "long": "Comprobando la conexión con el servidor…"
+    },
+    "online": {
+      "short": "Conectado",
+      "long": "El servidor responde. Es una comprobación básica: el estado de los motores de transcripción está en Ajustes."
+    },
+    "offline": {
+      "short": "Sin conexión",
+      "long": "No se alcanza el servidor. Puedes seguir grabando y guardando; lo enviarás a transcribir cuando vuelva."
+    },
+    "limited": {
+      "short": "En espera",
+      "long": "El servidor ha pedido esperar un poco por exceso de peticiones. La app se pone en pausa sola y sigue en cuanto pueda; no hace falta hacer nada."
+    }
+  },
+  "theme": {
+    "cycle": "Modo: {mode}. Cambiar",
+    "system": "Automático",
+    "day": "Claro",
+    "night": "Oscuro",
+    "label": "Apariencia",
+    "systemHint": "Automático (sigue al sistema)",
+    "auto": "Auto"
+  },
+  "lang": {
+    "switch": "Cambiar idioma de la interfaz"
+  },
+  "studio": {
+    "eyebrow": "Estudio",
+    "title1": "Tu voz, convertida en",
+    "title2": "texto.",
+    "lede": "Graba una reunión aquí mismo o sube un audio o un vídeo. Lo transcribimos y te lo dejamos listo para leer, analizar y descargar.",
+    "offline": "Sin conexión con el servidor. Puedes grabar y guardar; la transcripción se enviará cuando vuelva.",
+    "recent": "Recientes",
+    "seeAll": "Ver todo",
+    "recentEmpty": "Aquí aparecerán tus últimas grabaciones y archivos."
+  },
+  "recorder": {
+    "title": "Grabadora",
+    "mode": "Qué grabar",
+    "modes": {
+      "mic": "Micrófono",
+      "meeting": "Reunión online"
+    },
+    "meetingUnsupported": "Tu navegador o dispositivo no permite capturar el audio de una pestaña o del sistema.",
+    "language": "Idioma del audio",
+    "start": "Grabar",
+    "recordingLabel": "Grabación en curso",
+    "recordingState": "Grabando",
+    "pausedState": "En pausa",
+    "pause": "Pausar",
+    "resume": "Continuar",
+    "stop": "Detener",
+    "discard": "Descartar",
+    "discardConfirm": "¿Descartar?",
+    "hintMic": "Pulsa Grabar para empezar. Si cierras la pestaña sin querer, la grabación se recupera al volver.",
+    "hintMeeting": "Te pediremos el micrófono y que elijas la pestaña o pantalla de la reunión. Marca «Compartir audio» para que se grabe también la voz de los demás.",
+    "defaultName": "Reunión",
+    "recoveredName": "Recuperada ·",
+    "recovered": "Se ha recuperado una grabación que quedó interrumpida. La tienes en la biblioteca.",
+    "errors": {
+      "unsupported": "Este navegador no puede grabar audio, o la página no se abrió por HTTPS (en local vale localhost).",
+      "denied": "No hay permiso para usar el micrófono. Actívalo en el candado de la barra de direcciones y vuelve a intentarlo.",
+      "noDevice": "No se encuentra ningún micrófono. Conecta uno y vuelve a intentarlo.",
+      "busy": "El micrófono está siendo usado por otra aplicación.",
+      "noSystemAudio": "No se compartió audio. Vuelve a elegir la pestaña y marca «Compartir audio» (en Chrome, con una pestaña o con «Toda la pantalla»).",
+      "failed": "No se pudo grabar. Inténtalo de nuevo."
+    }
+  },
+  "review": {
+    "eyebrow": "Grabación terminada",
+    "title": "Nueva grabación",
+    "name": "Nombre",
+    "language": "Idioma del audio",
+    "transcribeNow": "Transcribir en cuanto se guarde",
+    "saveAndTranscribe": "Guardar y transcribir",
+    "save": "Guardar",
+    "download": "Descargar audio",
+    "discard": "Descartar",
+    "discardConfirm": "¿Descartar?",
+    "heading": "Escúchala y guárdala"
+  },
+  "recbar": {
+    "recording": "Grabando",
+    "paused": "Grabación en pausa",
+    "ready": "Grabación lista para guardar",
+    "open": "Abrir estudio",
+    "review": "Revisar"
+  },
+  "dropzone": {
+    "title": "Suelta aquí tus audios y vídeos",
+    "hint": "Se guardan en este navegador y se envían a transcribir. Hasta 2 GB por archivo.",
+    "choose": "Elegir archivos",
+    "formats": "Formatos admitidos",
+    "window": "Archivos"
+  },
+  "upload": {
+    "reject": {
+      "extension": "formato no admitido",
+      "empty": "el archivo está vacío",
+      "tooLarge": "supera el tamaño máximo"
+    },
+    "added": {
+      "one": "{count} archivo añadido a la biblioteca",
+      "other": "{count} archivos añadidos a la biblioteca"
+    }
+  },
+  "status": {
+    "local": "Solo local",
+    "uploading": "Subiendo",
+    "uploadFailed": "No se envió",
+    "Queued": "En cola",
+    "Processing": "Transcribiendo",
+    "Completed": "Lista",
+    "Failed": "Fallida"
+  },
+  "progress": {
+    "uploading": "Subiendo… {percent}%",
+    "queued": "En cola, esperando su turno",
+    "processing": "Transcribiendo · fragmento {done} de {total}",
+    "preparing": "Preparando el audio…"
+  },
+  "card": {
+    "details": "Detalles",
+    "transcribe": "Transcribir",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar?",
+    "failedNote": "La transcripción falló. Puedes reintentarla.",
+    "noWave": "Sin vista previa de la onda",
+    "remoteNote": "Abierta por identificador: el audio no está en este navegador."
+  },
+  "library": {
+    "eyebrow": "Biblioteca",
+    "title1": "Tus",
+    "title2": "reuniones",
+    "search": "Buscar por nombre…",
+    "filters": "Filtrar",
+    "filter": {
+      "all": "Todo",
+      "active": "En curso",
+      "done": "Listas",
+      "attention": "Con problemas",
+      "local": "Sin enviar"
+    },
+    "ready": "«{name}» ya está transcrita.",
+    "noResults": "Ninguna reunión coincide con la búsqueda.",
+    "empty": {
+      "title": "Todo empieza con una voz",
+      "text": "Todavía no hay nada aquí. Graba tu primera reunión o sube un audio o un vídeo.",
+      "cta": "Ir al estudio"
+    },
+    "byId": {
+      "open": "Abrir por identificador",
+      "label": "Identificador de la reunión en el servidor",
+      "submit": "Abrir",
+      "invalid": "Eso no parece un identificador válido (GUID).",
+      "note": "El servidor no lista las reuniones, así que la biblioteca se guarda en este navegador. Aquí puedes recuperar una reunión de otro navegador si conoces su identificador. No tendrá el audio original."
+    }
+  },
+  "meeting": {
+    "backToLibrary": "Biblioteca",
+    "notFound": "No encontramos esa reunión en este navegador",
+    "rename": "Cambiar el nombre",
+    "deleteConfirm": "¿Eliminar?",
+    "tabs": "Vista",
+    "tabTranscript": "Transcripción",
+    "tabAnalysis": "Análisis",
+    "transcriptError": "No se pudo cargar la transcripción.",
+    "uploadingTitle": "Subiendo el archivo",
+    "uploadingHint": "No cierres esta pestaña hasta que termine la subida.",
+    "processingTitle": "Transcribiendo",
+    "processingHint": "El servidor trabaja por fragmentos de unos 10 minutos. Puedes cerrar la pestaña: al volver verás el resultado.",
+    "failedTitle": "La transcripción falló",
+    "failedHint": "Reintentar vuelve a procesar el audio completo desde el principio y ocupa de nuevo el equipo del servidor.",
+    "retryJob": "Reintentar transcripción",
+    "uploadFailedTitle": "No se pudo enviar",
+    "uploadFailedText": "El archivo sigue guardado en este navegador. Comprueba la conexión y vuelve a intentarlo.",
+    "localTitle": "Guardada, todavía sin transcribir",
+    "localText": "El audio está a salvo en este navegador. Elige el idioma y envíalo cuando quieras.",
+    "retries": {
+      "one": "Ya se ha reintentado {count} vez.",
+      "other": "Ya se ha reintentado {count} veces."
+    }
+  },
+  "player": {
+    "label": "Reproductor",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "back": "Retroceder 15 segundos",
+    "forward": "Avanzar 15 segundos",
+    "seek": "Posición de la reproducción",
+    "speed": "Velocidad de reproducción"
+  },
+  "transcript": {
+    "play": "Escuchar desde aquí",
+    "playAt": "Escuchar desde {time}",
+    "chunkTiming": "Con este modelo las marcas de tiempo son aproximadas: cada bloque marca el inicio de un fragmento de unos 10 minutos, no el de cada frase.",
+    "search": "Buscar en la transcripción…",
+    "noMatches": "Sin resultados",
+    "prev": "Resultado anterior",
+    "next": "Resultado siguiente",
+    "follow": "Seguir el audio",
+    "empty": "La transcripción no contiene texto.",
+    "speakers": "Voces",
+    "renameSpeaker": "Poner nombre a esta voz",
+    "showAll": "Ver las {count} voces",
+    "showFewer": "Ver menos",
+    "speakerScope": "Las etiquetas de voz (A, B…) se reinician en cada fragmento de unos 10 minutos: «Voz A · parte 1» y «Voz A · parte 2» pueden ser personas distintas. Ponles nombre a mano para unificarlas.",
+    "count": {
+      "one": "{count} bloque",
+      "other": "{count} bloques"
+    }
+  },
+  "speaker": {
+    "voice": "Voz {label}",
+    "voicePart": "Voz {label} · parte {part}",
+    "unknown": "Hablante sin determinar",
+    "numbered": "Hablante {n}"
+  },
+  "analysis": {
+    "disclaimer": "Lectura automática hecha en tu navegador con recuentos y patrones de texto, sin IA. Puede fallar o dejarse cosas: compruébalo siempre con el audio, sobre todo nombres, cifras y fechas.",
+    "disclaimerShort": "Detectado por patrones de texto, sin IA. Verifícalo con el audio.",
+    "duration": "Duración",
+    "words": "Palabras",
+    "speakers": "Voces",
+    "questions": "Preguntas",
+    "voiceLabels": "Etiquetas de voz",
+    "pace": "Ritmo",
+    "wpm": "pal/min",
+    "whoSpeaks": "Quién habla",
+    "wordsCount": {
+      "one": "{n} palabra",
+      "other": "{n} palabras"
+    },
+    "turns": {
+      "one": "{count} intervención",
+      "other": "{count} intervenciones"
+    },
+    "shareByWords": "Con este modelo no hay tiempos por frase, así que el reparto se calcula por palabras, no por tiempo hablado.",
+    "timeline": "Línea de tiempo",
+    "keywords": "Palabras clave",
+    "times": {
+      "one": "{count} vez",
+      "other": "{count} veces"
+    },
+    "actions": "Acuerdos y tareas",
+    "actionsHint": "Frases que suelen introducir un compromiso o algo pendiente.",
+    "actionsEmpty": "No se han detectado compromisos con las expresiones habituales.",
+    "figures": "Cifras y fechas a verificar",
+    "figuresHint": "Importes, porcentajes y fechas: lo más delicado de transcribir mal.",
+    "figuresEmpty": "No se han detectado importes ni fechas.",
+    "questionsTitle": "Preguntas",
+    "questionsEmpty": "No hay preguntas en la transcripción.",
+    "showInTranscript": "Ver en la transcripción",
+    "listen": "Escuchar este momento"
+  },
+  "export": {
+    "button": "Descargar",
+    "title": "Descargar transcripción",
+    "txt": "Texto (.txt)",
+    "txtHint": "Con hora y nombre de cada voz",
+    "md": "Documento (.md)",
+    "mdHint": "Con palabras clave, hallazgos y transcripción",
+    "srt": "Subtítulos (.srt)",
+    "srtHint": "Para reproductores de vídeo",
+    "vtt": "Subtítulos web (.vtt)",
+    "vttHint": "Para el navegador y editores",
+    "json": "Datos (.json)",
+    "jsonHint": "Segmentos con tiempos y voces",
+    "copy": "Copiar texto",
+    "copyHint": "Al portapapeles",
+    "copied": "Transcripción copiada.",
+    "copyFailed": "No se pudo copiar al portapapeles.",
+    "server": "Original del servidor (.txt)",
+    "serverHint": "Sin tus nombres de voz",
+    "media": "Audio original",
+    "mediaHint": "El archivo guardado en este navegador"
+  },
+  "md": {
+    "date": "Fecha",
+    "language": "Idioma",
+    "duration": "Duración",
+    "speakers": "Voces",
+    "words": "Palabras",
+    "transcript": "Transcripción"
+  },
+  "settings": {
+    "eyebrow": "Ajustes",
+    "title1": "Preferencias",
+    "title2": "y conexión",
+    "appearance": "Apariencia",
+    "theme": "Apariencia",
+    "interfaceLanguage": "Idioma de la interfaz",
+    "transcription": "Transcripción",
+    "audioLanguage": "Idioma del audio por defecto",
+    "audioLanguageHint": "Se envía al servidor con cada archivo.",
+    "autoTranscribe": "Transcribir al guardar",
+    "autoTranscribeHint": "Envía cada grabación o archivo nuevo al servidor automáticamente.",
+    "connection": "Conexión",
+    "checkNow": "Comprobar ahora",
+    "lastCheck": "Última comprobación: {time}",
+    "connectionHelp": "La app habla con la API a través de un proxy (/api) que añade la clave de acceso, así que la clave nunca llega al navegador.",
+    "storage": "Almacenamiento local",
+    "storageUsed": "{used} usados de {quota} disponibles",
+    "storageItems": {
+      "one": "{count} elemento en la biblioteca",
+      "other": "{count} elementos en la biblioteca"
+    },
+    "privacy": "La carpeta que elijas es el destino final de cada reunión. Este navegador conserva además una copia de trabajo para escucharlas y leerlas en la app, y el servidor guarda una copia temporal (24 h) mientras procesa. Borrar los datos locales no toca tu carpeta ni la copia del servidor.",
+    "clear": "Borrar todos los datos locales",
+    "clearConfirm": "¿Borrar todo?",
+    "cleared": "Datos locales borrados.",
+    "folder": "Carpeta de reuniones",
+    "microphone": "Micrófono"
+  },
+  "errors": {
+    "unknown": "Ha ocurrido un error inesperado.",
+    "offline": "No se alcanza el servidor. Comprueba la conexión.",
+    "badRequest": "El servidor rechazó la petición.",
+    "auth": "El servidor no acepta la clave de acceso. Revisa BACKEND_API_KEY en el archivo .env.",
+    "notFound": "El servidor no conoce esa reunión.",
+    "conflict": "La reunión no está en un estado que permita esa acción.",
+    "tooLarge": "El archivo supera el tamaño que acepta el servidor.",
+    "unsupported": "El servidor no acepta este tipo de envío.",
+    "server": "El servidor tuvo un problema. Inténtalo de nuevo en un momento.",
+    "mediaMissing": "El archivo ya no está guardado en este navegador.",
+    "storage": "No se pudo guardar en el almacenamiento del navegador. Puede estar lleno o bloqueado.",
+    "job": {
+      "ProcessingFailed": "El servidor no pudo procesar el audio.",
+      "WorkerInterrupted": "El servidor se interrumpió mientras trabajaba en esta reunión.",
+      "unknown": "El servidor no indicó el motivo.",
+      "other": "El servidor indicó el código «{code}»."
+    },
+    "forbidden": "El servidor no permite esta acción.",
+    "blocked": "El servidor ha bloqueado temporalmente las peticiones de este equipo por exceso de intentos.",
+    "rateLimited": "Demasiadas peticiones seguidas.",
+    "paused": "En pausa por los límites del servidor.",
+    "waitSeconds": {
+      "one": "Espera {count} segundo.",
+      "other": "Espera {count} segundos."
+    },
+    "waitMinutes": {
+      "one": "Espera {count} minuto.",
+      "other": "Espera {count} minutos."
+    },
+    "unavailable": "El servidor no puede atender esto ahora mismo.",
+    "codes": {
+      "ProcessingFailed": "El servidor no pudo procesar el audio.",
+      "WorkerInterrupted": "El servidor se interrumpió mientras trabajaba en esta reunión.",
+      "WorkerPersistenceFailed": "El servidor no pudo guardar el progreso de la transcripción.",
+      "UnexpectedError": "El servidor tuvo un error inesperado.",
+      "MediaProcessingTimeout": "Preparar el audio llevó demasiado tiempo en el servidor.",
+      "InvalidMediaOrMissingAudio": "El archivo está dañado, su formato no es compatible o el vídeo no tiene pista de audio.",
+      "NoAudio": "No se encontró voz que transcribir en el audio.",
+      "ChunkTooLarge": "Un fragmento del audio era demasiado grande para procesarlo.",
+      "FFmpegUnavailable": "El servidor no encuentra FFmpeg, que necesita para preparar el audio.",
+      "WhisperModelMissing": "Falta el modelo de transcripción (Whisper) en el servidor.",
+      "WhisperRuntimeUnavailable": "El motor de transcripción (Whisper) no puede arrancar en el servidor.",
+      "WhisperInferenceFailed": "El motor de transcripción falló. Puede que el modelo esté dañado o que falten recursos en el equipo.",
+      "DiarizationRuntimeUnavailable": "El separador de hablantes no está instalado en el servidor.",
+      "DiarizationModelMissing": "Falta el modelo para separar hablantes en el servidor.",
+      "DiarizationFailed": "Falló la separación de hablantes.",
+      "LocalInferenceTimeout": "El equipo del servidor tardó demasiado en procesar. Inténtalo con menos carga.",
+      "LocalInferenceBusy": "El servidor ya está generando otro resumen. Espera a que termine e inténtalo de nuevo.",
+      "SummaryUnavailable": "El resumidor local (Ollama) no está en marcha en el servidor.",
+      "SummaryModelMissing": "Falta descargar en Ollama el modelo de resumen.",
+      "SummaryModelNotLocal": "El modelo de resumen configurado no es local; el servidor no lo usa.",
+      "SummaryInvalidResponse": "El modelo devolvió un resumen no válido. Vuelve a intentarlo.",
+      "SummaryInputTooLarge": "La transcripción es demasiado larga para resumirla.",
+      "MeetingRetryLimitExceeded": "Se ha alcanzado el máximo de reintentos para esta reunión.",
+      "MeetingNotFailedOrRetryLimitExceeded": "La reunión no se puede reintentar: no está fallida o ya no quedan reintentos.",
+      "TranscriptNotCompleted": "La transcripción todavía no está completa.",
+      "MeetingStillActive": "La reunión sigue en proceso; espera a que termine.",
+      "LocalFilesNotSaved": "Primero hay que guardar los archivos.",
+      "SecurityCapacityReached": "El servidor está saturado ahora mismo. Inténtalo en unos minutos.",
+      "ProviderQuotaExceeded": "Falló por la cuota del antiguo proveedor externo. Ya no se usa: reintenta con los motores locales.",
+      "ProviderSpendLimitExceeded": "Falló por el límite de gasto del antiguo proveedor externo. Ya no se usa: reintenta con los motores locales.",
+      "ProviderRateLimited": "El antiguo proveedor externo limitó las peticiones. Ya no se usa: reintenta con los motores locales.",
+      "MissingProviderKey": "Faltaba la clave del antiguo proveedor externo. Ya no se usa: reintenta con los motores locales."
+    }
+  },
+  "deck": {
+    "model": "Grabadora de voz",
+    "ready": "Listo",
+    "waiting": "Esperando permiso",
+    "level": "Nivel de entrada",
+    "idleHint": "Listo para grabar"
+  },
+  "local": {
+    "window": "Destino",
+    "askTitle": "¿Dónde quieres guardar las reuniones?",
+    "askText": "Elige una carpeta de tu ordenador: ahí quedarán la grabación, la transcripción y el resumen de cada reunión. El servidor solo guarda una copia temporal mientras procesa, y la ruta de tu carpeta nunca sale del navegador.",
+    "choose": "Seleccionar carpeta",
+    "change": "Cambiar carpeta",
+    "renew": "Renovar permiso",
+    "forget": "Olvidar carpeta",
+    "current": "Guardando en",
+    "needsPermission": "El navegador necesita que vuelvas a autorizar la escritura en «{name}».",
+    "denied": "Has denegado el acceso a «{name}». Elige la carpeta otra vez.",
+    "unsupported": "Este navegador no permite elegir una carpeta (hace falta Chrome o Edge, por HTTPS o localhost). Podrás descargar los archivos de cada reunión.",
+    "autoSave": "Guardar al terminar",
+    "autoSaveHint": "En cuanto termina la transcripción se escriben los archivos en la carpeta. Eliminar la copia del servidor es siempre un paso manual.",
+    "autoSaved": "«{name}» guardada en la carpeta «{folder}».",
+    "panelTitle": "Guardado local",
+    "expires": "La copia temporal del servidor caduca {when}.",
+    "expired": "La copia temporal del servidor ya ha caducado: el servidor puede haberla eliminado.",
+    "serverDeleted": "La copia del servidor se ha eliminado. Lo que queda está en tu carpeta.",
+    "step1": "Guardar en tu carpeta",
+    "step1Hint": "Original, transcripción (JSON y TXT) y, si ya lo has generado, el resumen.",
+    "step1Done": "Guardada en «{root}/{folder}»",
+    "step1DoneDownloads": "Descargada: {count} archivos",
+    "save": "Guardar en la carpeta",
+    "saveAgain": "Guardar de nuevo",
+    "saving": "Guardando {done} de {total}…",
+    "savingStart": "Preparando…",
+    "download": "Descargar los archivos",
+    "noFolderYet": "Elige primero una carpeta de destino.",
+    "step2": "Resumen (opcional)",
+    "step2Hint": "Genéralo en la pestaña Análisis antes de guardar y se incluirá en la carpeta.",
+    "summaryIn": "Incluido en la carpeta",
+    "summaryOut": "No incluido",
+    "step3": "Eliminar la copia del servidor",
+    "step3Hint": "Borra para siempre el original y la transcripción del servidor. Tus archivos no se tocan. No elimina las copias de seguridad del servidor.",
+    "delete": "Eliminar copia del servidor",
+    "deleteConfirm": "¿Eliminar para siempre?",
+    "deleteLocked": "Se activa cuando los archivos estén guardados.",
+    "deleted": "Copia del servidor eliminada.",
+    "savedFiles": "Archivos: {files}",
+    "folderBadge": "En tu carpeta",
+    "downloadBadge": "Descargada",
+    "errors": {
+      "unsupported": "Este navegador no permite escribir en una carpeta.",
+      "permission": "Falta permiso para escribir en la carpeta. Renuévalo y vuelve a guardar.",
+      "inactive": "La reunión no está lista para guardarse (o la transcripción no está en este navegador).",
+      "disk": "No hay espacio suficiente en el disco.",
+      "verify": "Un archivo no se escribió completo. La copia del servidor sigue intacta: vuelve a intentarlo.",
+      "expired": "El servidor ya no tiene los archivos (la copia temporal caducó o se eliminó).",
+      "artifact": "El servidor rechazó la descarga de un archivo (HTTP {status}).",
+      "write": "No se pudo escribir en la carpeta.",
+      "deleteFailed": "No se pudo eliminar la copia del servidor."
+    }
+  },
+  "summary": {
+    "title": "Resumen",
+    "generate": "Generar resumen",
+    "regenerate": "Volver a generar",
+    "generating": "Generando el resumen…",
+    "cost": "Lo genera el servidor con un modelo local, sin servicios externos. Tarda unos minutos y hace uno a la vez. Se guarda en este navegador y se incluye al guardar en la carpeta.",
+    "draftNotice": "Borrador generado automáticamente. Requiere revisión humana.",
+    "draftShort": "Borrador · revisión humana",
+    "overview": "Visión general",
+    "highlights": "Puntos destacados",
+    "decisions": "Decisiones",
+    "actionItems": "Tareas",
+    "openQuestions": "Preguntas pendientes",
+    "segments": "segmentos",
+    "none": "Ninguno",
+    "generatedAt": "Generado {when}",
+    "evidence": "Ver el segmento {n} en la transcripción",
+    "unavailable": "La copia del servidor se eliminó: ya no se puede generar un resumen nuevo.",
+    "evidenceNote": "Los números enlazan con la frase de la transcripción que respalda cada punto. Que exista la referencia no certifica que el contenido sea verdad.",
+    "errors": {
+      "notReady": "La transcripción todavía no está completa.",
+      "tooLong": "La transcripción supera el límite de 500.000 caracteres para el resumen.",
+      "invalid": "El modelo devolvió un resumen no válido. Vuelve a intentarlo.",
+      "unavailable": "El resumidor local del servidor no está disponible ahora.",
+      "timeout": "El modelo local tardó demasiado. Inténtalo de nuevo con menos carga en el servidor."
+    }
+  },
+  "mic": {
+    "label": "Micrófono",
+    "count": {
+      "one": "{count} disponible",
+      "other": "{count} disponibles"
+    },
+    "default": "Predeterminado del sistema",
+    "defaultNamed": "Predeterminado · {name}",
+    "unnamed": "Micrófono {n}",
+    "missing": "Micrófono no disponible",
+    "missingNote": "El micrófono que elegiste ya no está conectado. Al grabar se usará el predeterminado del sistema.",
+    "grant": "Permitir acceso",
+    "grantHint": "El navegador solo muestra los nombres de los micrófonos cuando le das permiso. Este paso no graba nada.",
+    "denied": "El acceso al micrófono está bloqueado. Actívalo desde el candado de la barra de direcciones y recarga la página.",
+    "test": "Probar",
+    "testStop": "Detener prueba",
+    "testStarting": "Abriendo el micrófono…",
+    "testing": "Habla para ver el nivel",
+    "testError": "No se pudo abrir ese micrófono.",
+    "level": "Nivel de entrada",
+    "unsupported": "Este navegador no permite elegir el micrófono.",
+    "fallback": "El micrófono elegido no estaba disponible: se ha grabado con el predeterminado del sistema."
+  },
+  "engine": {
+    "title": "Motores del servidor",
+    "transcription": "Transcripción",
+    "speakers": "Hablantes",
+    "summary": "Resumen",
+    "ready": "Listo",
+    "missing": "No disponible",
+    "disabled": "desactivado",
+    "notReady": "El servidor no puede transcribir ahora.",
+    "unknown": "No se pudo consultar el estado de los motores.",
+    "help": "Todo se procesa en el servidor con modelos locales: Whisper para transcribir, Community-1 para separar hablantes y Ollama para resumir. Que estén listos no garantiza que cada transcripción salga bien."
+  }
+}

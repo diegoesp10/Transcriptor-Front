@@ -1,0 +1,377 @@
+/* Estructura: barra lateral flotante (escritorio) / barra de pestañas (móvil), contenedor y cabeceras. */
+
+.app {
+  display: grid;
+  grid-template-columns: 276px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.main {
+  min-width: 0;
+  padding: 36px 40px 140px 28px;
+}
+
+.view {
+  max-width: 1180px;
+  margin-inline: auto;
+  animation: view-in 0.4s var(--ease) both;
+}
+
+/* ── Barra lateral ─────────────────────────────────────────────────────────── */
+
+.sidebar {
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  height: calc(100dvh - 24px);
+  margin: 12px 0 12px 12px;
+  padding: 18px 12px 12px;
+  border-radius: 28px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 8px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--blue);
+  color: #fff;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.2s var(--ease);
+}
+
+.nav-item:hover {
+  background: light-dark(rgb(0 0 0 / 0.045), rgb(255 255 255 / 0.07));
+}
+
+.nav-item.is-current {
+  background: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.13));
+  font-weight: 600;
+}
+
+.nav-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+
+.nav-badge {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--red);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.nav-rec {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 2px var(--surface);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding: 0 4px;
+}
+
+.sidebar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.appearance {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 4px 4px;
+}
+
+.appearance-label {
+  padding-left: 4px;
+  color: var(--label-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Tres iconos que se reparten el ancho; la pastilla marca el modo activo */
+.segmented.theme-seg {
+  display: grid;
+  width: 100%;
+}
+
+.segmented.theme-seg button {
+  gap: 5px;
+  height: 32px;
+  padding: 0 4px;
+  font-size: 12.5px;
+}
+
+.lang-btn {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  height: 28px;
+  padding: 0 12px 0 10px;
+  border-radius: 14px;
+  background: var(--fill);
+  color: var(--label-2);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.status-pill i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--label-3);
+}
+
+.status-online i {
+  background: var(--green);
+}
+
+.status-offline i {
+  background: var(--red);
+}
+
+.status-limited i {
+  background: var(--orange);
+}
+
+.status-checking i {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* ── Cabeceras de página ───────────────────────────────────────────────────── */
+
+.page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 28px;
+}
+
+.page-head-row {
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+h1 {
+  font-size: clamp(30px, 4.2vw, 40px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.lede {
+  max-width: 62ch;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--label-2);
+  text-wrap: pretty;
+}
+
+.state-center {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+  color: var(--label-2);
+}
+
+/* ── Adaptación ────────────────────────────────────────────────────────────── */
+
+/* Tableta: la barra lateral se queda solo en iconos */
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .main {
+    padding: 28px 24px 140px 20px;
+  }
+
+  .sidebar {
+    align-items: center;
+    padding-inline: 8px;
+  }
+
+  .brand {
+    padding: 0;
+  }
+
+  .brand-name,
+  .nav-label,
+  .status-pill span {
+    display: none;
+  }
+
+  .nav-item {
+    justify-content: center;
+    width: 48px;
+    padding: 0;
+  }
+
+  .sidebar-foot {
+    align-items: center;
+    padding: 0;
+  }
+
+  .status-pill {
+    align-self: center;
+    padding: 0 9px;
+  }
+
+  .appearance-label,
+  .theme-text {
+    display: none;
+  }
+
+  .segmented.theme-seg button {
+    padding: 0;
+  }
+
+  .appearance {
+    padding: 0;
+  }
+
+  .sidebar-row {
+    flex-direction: column;
+  }
+
+  .segmented.theme-seg {
+    width: 36px;
+    grid-template-columns: 1fr;
+  }
+
+  .segmented.theme-seg .segmented-thumb {
+    width: calc(100% - 4px);
+    height: calc((100% - 4px) / var(--n));
+    transform: translateY(calc(var(--i) * 100%));
+  }
+}
+
+/* Móvil: la barra se convierte en una barra de pestañas flotante en la parte inferior */
+@media (max-width: 760px) {
+  .app {
+    display: block;
+  }
+
+  .main {
+    padding: 20px 16px 130px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: auto;
+    right: 14px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 14px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0;
+    height: 66px;
+    margin: 0;
+    padding: 6px;
+    border-radius: 33px;
+  }
+
+  .brand,
+  .sidebar-foot,
+  .appearance {
+    display: none;
+  }
+
+  .nav {
+    flex-direction: row;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .nav-item {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    width: auto;
+    height: 54px;
+    border-radius: 27px;
+    font-size: 10.5px;
+  }
+
+  .nav-label {
+    display: block;
+  }
+
+  .page-head-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
