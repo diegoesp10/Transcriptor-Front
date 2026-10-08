@@ -15,6 +15,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { Agent as HttpAgent, createServer, request as httpRequest } from 'node:http';
 import { Agent as HttpsAgent, request as httpsRequest } from 'node:https';
+import { isIPv4, isIPv6 } from 'node:net';
 import { extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { brotliCompressSync, constants as zlib, gzipSync } from 'node:zlib';
@@ -36,6 +37,8 @@ const config = {
   basicAuthUser: env.BASIC_AUTH_USER ?? '',
   basicAuthPassword: env.BASIC_AUTH_PASSWORD ?? '',
   hstsSeconds: Number(env.HSTS_MAX_AGE || 0),
+  /** Cabecera con la IP real del visitante que pone el proxy de delante (IIS) y que el backend usa para sus límites */
+  clientIpHeader: (env.CLIENT_IP_HEADER || 'X-Murmur-Client-IP').toLowerCase(),
   logRequests: env.LOG_REQUESTS == null ? true : flag(env.LOG_REQUESTS),
   staticDir: resolve(fileURLToPath(new URL('.', import.meta.url)), env.STATIC_DIR || '../dist'),
 };
@@ -194,8 +197,17 @@ function proxy(req, res) {
   const headers = {};
   for (const [name, value] of Object.entries(req.headers)) if (!STRIP_REQUEST.has(name)) headers[name] = value;
   headers['x-api-key'] = config.apiKey;
-  headers['x-forwarded-for'] = [req.headers['x-forwarded-for'], req.socket.remoteAddress].filter(Boolean).join(', ');
-  headers['x-forwarded-proto'] = req.headers['x-forwarded-proto'] ?? (req.socket.encrypted ? 'https' : 'http');
+
+  // IP del visitante y protocolo original. Solo se aceptan los que trae la petición si viene de un proxy de la red privada
+  // (IIS → Docker, o un proxy en la misma máquina), que los sobrescribe. Desde cualquier otra IP serían falsificables:
+  // se usan los de la propia conexión, para que nadie se salte los límites por IP del backend.
+  const peer = normalizeIp(req.socket.remoteAddress);
+  const viaProxy = isPrivateIp(peer);
+  const forwardedIp = viaProxy ? firstValue(req.headers[config.clientIpHeader]) : null;
+  headers[config.clientIpHeader] = forwardedIp && isIp(forwardedIp) ? forwardedIp : peer;
+  headers['x-forwarded-for'] = viaProxy ? [req.headers['x-forwarded-for'], peer].filter(Boolean).join(', ') : peer;
+  const forwardedProto = viaProxy ? firstValue(req.headers['x-forwarded-proto']) : null;
+  headers['x-forwarded-proto'] = forwardedProto === 'https' || forwardedProto === 'http' ? forwardedProto : req.socket.encrypted ? 'https' : 'http';
   headers['x-forwarded-host'] = req.headers.host ?? '';
 
   const upstream = backendRequest(target, { method: req.method, headers, agent: backendAgent }, (answer) => {
@@ -223,6 +235,19 @@ function proxy(req, res) {
     if (!res.writableFinished) upstream.destroy();
   });
   req.pipe(upstream);
+}
+
+const firstValue = (value) => (Array.isArray(value) ? value[0] : value)?.split(',')[0]?.trim() || null;
+const normalizeIp = (address) => (address ?? '').replace(/^::ffff:/, '');
+const isIp = (value) => isIPv4(value) || isIPv6(value);
+
+/** Loopback y rangos privados (incluidas las redes de Docker): de ahí solo llega un proxy propio, no un visitante */
+function isPrivateIp(address) {
+  if (isIPv4(address)) {
+    const [a, b] = address.split('.').map(Number);
+    return a === 127 || a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+  }
+  return address === '::1' || /^f[cd]/i.test(address);
 }
 
 function problem(res, status, code) {

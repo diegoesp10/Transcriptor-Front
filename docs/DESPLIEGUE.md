@@ -78,6 +78,31 @@ docker compose up -d --build
 
 La imagen compila la web en una primera fase y solo copia el resultado a la imagen final (`node:22-alpine`, usuario sin privilegios, sistema de archivos de solo lectura en Compose). Incluye un `HEALTHCHECK` contra `/healthz`. Si el backend corre en la misma máquina fuera de Docker, usa `BACKEND_URL=http://host.docker.internal:52611`.
 
+### Opción 3: tu propio PC con IIS y Docker
+
+Es el montaje que prepara el backend (su `docs/DOCKER.md`): un Compose con el frontal, la API y Ollama, e IIS delante con el certificado.
+
+```text
+Internet ──HTTPS 443──> IIS (URL Rewrite + ARR) ──HTTP──> 127.0.0.1:8090 frontal (Docker) ──> API + motores (Docker)
+```
+
+- El Compose del backend construye **este** repositorio con su `Dockerfile` (`FRONTEND_PATH`), y su `Initialize-Docker.ps1` genera la clave común y el usuario y contraseña de la web (`deploy/docker/frontend.production.env`).
+- IIS sobrescribe `X-Murmur-Client-IP` con la IP del visitante. Este servidor la reenvía al backend solo si la petición llega desde la red privada (IIS → Docker); desde cualquier otra IP la sustituye por la de la conexión, para que nadie se salte los límites. El nombre se cambia con `CLIENT_IP_HEADER`.
+- El progreso en directo pasa por ARR: hay que poner su *Response buffer threshold* a 0 y desactivar la compresión dinámica (la plantilla `deploy/iis/web.config.example` del backend ya desactiva la de IIS).
+
+Para abrirlo a Internet desde casa, además:
+
+1. **IP pública**: comprueba que tu operador no usa CG-NAT (la IP WAN del router tiene que coincidir con la que ves en un «cuál es mi IP»). Con CG-NAT, la redirección de puertos no funciona: pide una IP pública al operador o usa un túnel.
+2. **Nombre**: un dominio propio con un registro A a tu IP, o un DNS dinámico (DuckDNS, No-IP) si tu IP cambia.
+3. **Router**: IP fija para el PC (reserva DHCP) y redirección de los puertos TCP 443 y 80 hacia él. El 80 solo sirve para validar el certificado y redirigir a HTTPS.
+4. **Certificado**: Let's Encrypt con win-acme, que crea el binding HTTPS en IIS y lo renueva solo.
+5. **Firewall de Windows**: entrada 80 y 443 para IIS. Nada más: ni SQL Server, ni Docker, ni el 8090.
+6. **Acceso**: deja activadas `BASIC_AUTH_USER` y `BASIC_AUTH_PASSWORD`; la web es la única puerta a la API.
+7. **El PC encendido**: sin suspensión, y con Docker Desktop arrancando al iniciar sesión (Docker Desktop no corre sin una sesión de usuario abierta).
+8. **Prueba desde fuera**: con el móvil sin wifi.
+
+Si usas un túnel (Cloudflare Tunnel, ngrok…) en vez de abrir puertos, revisa sus límites antes. Cloudflare en el plan gratuito corta las subidas de más de 100 MB y las respuestas que tardan más de 100 segundos (un resumen puede tardar más). Además, `{REMOTE_ADDR}` en IIS pasaría a ser la IP del túnel, no la del visitante.
+
 ### Plataformas gestionadas
 
 Cualquier servicio que ejecute un contenedor o una aplicación Node vale (Azure App Service, Azure Container Apps, AWS App Runner o ECS, Google Cloud Run, Kubernetes, un servicio de Windows…):
