@@ -1276,13 +1276,14 @@ input:focus-visible {
   flex: none;
 }
 
-.ring svg {
+/* Solo el SVG del anillo (hijo directo): el icono del centro también es un SVG y no debe heredar tamaño, giro ni trazo */
+.ring > svg {
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);
 }
 
-.ring circle {
+.ring > svg circle {
   fill: none;
   stroke-width: 7;
 }
@@ -1307,6 +1308,15 @@ input:focus-visible {
   inset: 0;
   display: grid;
   place-items: center;
+  /* Lo de dentro nunca pisa el trazo del anillo */
+  padding: 14%;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.ring-label > svg {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .ring-percent {
