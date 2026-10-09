@@ -281,10 +281,11 @@ h1 em {
     padding: 0;
   }
 
+  /* Solo en la barra lateral estrecha: la pastilla de estado de Ajustes conserva su texto */
   .brand-name,
   .env-badge,
   .nav-label,
-  .status-pill span {
+  .sidebar .status-pill span {
     display: none;
   }
 
@@ -299,7 +300,7 @@ h1 em {
     padding: 0;
   }
 
-  .status-pill {
+  .sidebar .status-pill {
     align-self: center;
     padding: 0 9px;
   }

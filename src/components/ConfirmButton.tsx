@@ -28,7 +28,8 @@ export function ConfirmButton({ onConfirm, label, confirmLabel, icon, className 
     <button
       className={`${className} ${armed ? 'is-armed' : ''}`}
       disabled={disabled}
-      aria-label={iconOnly ? text : undefined}
+      // Nombre accesible siempre: aunque el CSS oculte el texto en pantallas estrechas, el botón sigue diciendo qué hace
+      aria-label={text}
       title={iconOnly ? text : undefined}
       onClick={(event) => {
         event.stopPropagation();

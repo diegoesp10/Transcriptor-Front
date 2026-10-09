@@ -2,25 +2,36 @@
 
 /* ── Sección agrupada: rótulo pequeño y tarjeta sólida ─────────────────────── */
 
+/* Rótulo y dato lateral: si no caben juntos, el dato baja a otra línea en vez de estrujar el rótulo */
 .panel-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
+  gap: 2px 12px;
   padding: 0 14px 8px;
 }
 
 .panel-head h2 {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--label-2);
+  overflow-wrap: anywhere;
 }
 
-.panel-head span {
+.panel-head > span {
+  flex: none;
   font-size: 13px;
   color: var(--label-2);
+  white-space: nowrap;
 }
 
 .panel-body {
@@ -35,6 +46,25 @@
   overflow: hidden;
 }
 
+/* Teléfonos: un poco menos de relleno para que el contenido tenga sitio */
+@media (max-width: 560px) {
+  .panel-body {
+    padding: 16px;
+  }
+
+  .panel-head {
+    padding-inline: 12px;
+  }
+
+  .recorder .recorder-controls {
+    gap: 10px;
+  }
+
+  .recorder .control {
+    width: 76px;
+  }
+}
+
 .card {
   border-radius: var(--r-card);
   background: var(--surface);
@@ -43,19 +73,23 @@
 
 /* ── Botones ───────────────────────────────────────────────────────────────── */
 
+/* Nunca más anchos que su contenedor: si el texto no cabe (pantallas estrechas), pasa a dos líneas en vez de salirse */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 44px;
-  padding: 0 20px;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 6px 20px;
   border-radius: 22px;
   background: var(--fill);
   color: var(--accent);
   font-size: 15px;
   font-weight: 600;
-  white-space: nowrap;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
   transition:
     transform 0.2s var(--ease),
     opacity 0.2s,
@@ -75,16 +109,20 @@
   opacity: 0.4;
 }
 
+.btn > svg {
+  flex: none;
+}
+
 .btn-sm {
-  height: 34px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 4px 14px;
   border-radius: 17px;
   font-size: 13.5px;
 }
 
 .btn-lg {
-  height: 52px;
-  padding: 0 28px;
+  min-height: 52px;
+  padding: 8px 28px;
   border-radius: 26px;
   font-size: 17px;
 }
@@ -956,12 +994,13 @@ input:focus-visible {
   font-size: 12.5px;
 }
 
+/* Los botones laterales (56 px) se centran en la altura del de grabar (76 px): así las tres etiquetas quedan en la misma línea */
 .control .round {
-  margin-top: 10px;
+  margin-block: 10px;
 }
 
 .control:nth-child(2) .round {
-  margin-top: 0;
+  margin-block: 0;
 }
 
 .round {
@@ -1170,6 +1209,7 @@ input:focus-visible {
   flex: none;
   min-width: 42px;
   font-size: 13px;
+  white-space: nowrap;
 }
 
 .player-total {
@@ -1180,19 +1220,46 @@ input:focus-visible {
   flex: 1;
 }
 
+/* Móvil: controles y tiempos en una fila; debajo, la onda con la velocidad al lado */
 @media (max-width: 640px) {
-  .player-row {
-    flex-wrap: wrap;
-    row-gap: 6px;
+  .player-inner {
+    padding: 10px 12px 12px;
   }
 
-  .player-wave {
-    order: 5;
-    flex-basis: 100%;
+  .player-row {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'controls time total total'
+      'wave wave wave rate';
+    align-items: center;
+    gap: 6px 8px;
+  }
+
+  .player-controls {
+    grid-area: controls;
+  }
+
+  .player-time {
+    grid-area: time;
+    min-width: 0;
   }
 
   .player-total {
-    margin-right: auto;
+    grid-area: total;
+    justify-self: start;
+  }
+
+  .player-total::before {
+    content: '/ ';
+  }
+
+  .player-row > .chip-btn {
+    grid-area: rate;
+  }
+
+  .player-wave {
+    grid-area: wave;
   }
 }
 

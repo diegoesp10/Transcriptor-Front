@@ -82,7 +82,7 @@ export function Settings({ theme, onTheme, backend }: Props) {
               value={theme}
               onChange={(value, origin) => onTheme(value, origin)}
               options={[
-                { value: 'system', label: <><Monitor size={15} />{t('theme.system')}</>, title: t('theme.systemHint') },
+                { value: 'system', label: <><Monitor size={15} />{t('theme.auto')}</>, title: t('theme.systemHint'), ariaLabel: t('theme.systemHint') },
                 { value: 'day', label: <><Sun size={15} />{t('theme.day')}</> },
                 { value: 'night', label: <><Moon size={15} />{t('theme.night')}</> },
               ]}

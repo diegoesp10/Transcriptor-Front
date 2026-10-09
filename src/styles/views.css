@@ -264,6 +264,35 @@
   .folder-ask {
     flex-direction: column;
   }
+
+  /* Biblioteca: el buscador a todo el ancho y los filtros en una sola fila que se desplaza de lado, como en las apps del sistema */
+  .toolbar .search {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .toolbar .chips {
+    flex-wrap: nowrap;
+    width: calc(100% + 32px);
+    margin-inline: -16px;
+    padding-inline: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-padding-inline: 16px;
+  }
+
+  .toolbar .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toolbar .chip {
+    flex: none;
+  }
+
+  .view .by-id {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
 }
 
 /* ── Biblioteca ────────────────────────────────────────────────────────────── */
@@ -429,8 +458,10 @@
   font-size: 13px;
 }
 
+/* Datos en una línea y acciones a la derecha; si no caben juntos, las acciones bajan (nunca un dato por línea) */
 .item-foot {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
@@ -439,12 +470,18 @@
   border-top: 0.5px solid var(--separator);
 }
 
+.item-foot .meta {
+  flex: 1 1 150px;
+  min-width: 0;
+}
+
 .item-actions {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-left: auto;
 }
 
 /* ── Reunión ───────────────────────────────────────────────────────────────── */
@@ -522,6 +559,69 @@
 @media (max-width: 760px) {
   .dock {
     bottom: 92px;
+  }
+
+  /* Cabecera de la reunión en móvil: título más contenido y las acciones como dos botones que se reparten la fila */
+  .meeting-head {
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .meeting-title,
+  .meeting-actions {
+    width: 100%;
+  }
+
+  .title-edit {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .title-form input {
+    height: 46px;
+    font-size: 22px;
+  }
+
+  .meeting-actions > .menu {
+    flex: 1;
+  }
+
+  .meeting-actions > .menu > .btn {
+    width: 100%;
+  }
+
+  .meeting-actions {
+    flex-wrap: wrap;
+  }
+
+  .meeting-actions > .btn-plain {
+    padding-inline: 16px;
+    background: var(--fill);
+  }
+
+  /* El menú de descargas se abre desde la izquierda, a todo el ancho de la fila */
+  .meeting-actions .menu-panel {
+    right: auto;
+    left: 0;
+    width: min(350px, calc(100vw - 32px));
+    transform-origin: top left;
+  }
+}
+
+/* Teléfonos estrechos: «Eliminar» se queda en el icono (el nombre sigue en aria-label); armado, vuelve a mostrar «¿Eliminar?» */
+@media (max-width: 380px) {
+  .meeting-actions {
+    flex-wrap: nowrap;
+  }
+
+  .meeting-actions > .btn-plain:not(.is-armed) {
+    flex: none;
+    width: 44px;
+    padding: 0;
+  }
+
+  .meeting-actions > .btn-plain:not(.is-armed) > span {
+    display: none;
   }
 }
 
@@ -1253,6 +1353,47 @@ mark {
   line-height: 1.45;
 }
 
+@media (max-width: 640px) {
+  /* Dos datos por fila, más compactos */
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat {
+    padding: 14px;
+  }
+
+  .stat-icon {
+    margin-bottom: 8px;
+  }
+
+  .stat b {
+    font-size: 26px;
+  }
+
+  /* Con un número impar de datos, el último ocupa la fila entera en vez de quedarse cojo */
+  .stat:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  /* Sin desplazamiento dentro de la tarjeta (en el móvil choca con el de la página) y el texto a todo el ancho */
+  .finding-list {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .finding-list li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .finding-times {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
 /* Resumen con IA */
 
 .summary-panel h4 {
@@ -1524,8 +1665,23 @@ mark {
 @media (max-width: 560px) {
   .setting .row {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 10px;
+  }
+
+  /* Controles segmentados a todo el ancho, con opciones iguales */
+  .setting .segmented {
+    display: grid;
+    width: 100%;
+  }
+
+  .setting .segmented button {
+    padding: 0 8px;
+  }
+
+  .setting .row > .picker,
+  .setting .row > .status-pill {
+    align-self: flex-start;
   }
 
   .setting .row.switch-row {
